@@ -1,5 +1,7 @@
 package com.safetynet.safetynetalertsapi.model;
 
+import javax.validation.constraints.NotNull;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -8,8 +10,9 @@ public class Person {
 
 	@Id
 	private String id;
-
+	@NotNull
 	private String firstName;
+	@NotNull
 	private String lastName;
 	private String address;
 	private String city;
@@ -42,6 +45,7 @@ public class Person {
 
 	public void setFirstName(String firstName) {
 		this.firstName = firstName;
+
 	}
 
 	public String getLastName() {
