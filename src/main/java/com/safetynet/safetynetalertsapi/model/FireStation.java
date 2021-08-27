@@ -1,21 +1,26 @@
 package com.safetynet.safetynetalertsapi.model;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
+@Document(collection = "firestation")
 public class FireStation {
 
 	@Id
 	private String id;
 
+	@Field("address")
 	private String adresse;
-	private String station;
+	@Field("station")
+	private String stationNumber;
 
 	public FireStation() {
 	}
 
 	public FireStation(String adresse, String station) {
 		this.adresse = adresse;
-		this.station = station;
+		this.stationNumber = station;
 	}
 
 	public String getId() {
@@ -31,16 +36,16 @@ public class FireStation {
 	}
 
 	public String getStation() {
-		return station;
+		return stationNumber;
 	}
 
 	public void setStation(String station) {
-		this.station = station;
+		this.stationNumber = station;
 	}
 
 	@Override
 	public String toString() {
-		return "FireStation [id=" + id + ", adresse=" + adresse + ", station=" + station + "]";
+		return "FireStation [id=" + id + ", adresse=" + adresse + ", station=" + stationNumber + "]";
 	}
 
 }

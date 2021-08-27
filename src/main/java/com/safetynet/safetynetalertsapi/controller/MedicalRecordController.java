@@ -1,11 +1,14 @@
 package com.safetynet.safetynetalertsapi.controller;
 
+import java.net.URI;
 import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,9 +17,12 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.safetynet.safetynetalertsapi.model.MedicalRecord;
 import com.safetynet.safetynetalertsapi.service.MedicalRecordService;
+
+import io.micrometer.core.instrument.util.StringUtils;
 
 @RestController
 @RequestMapping("/medicalRecord")
@@ -32,9 +38,18 @@ public class MedicalRecordController {
 	 * @return - A List object of medical records full filled
 	 */
 	@GetMapping("/medicalRecords")
-	public List<MedicalRecord> getMedicalRecords() {
+	public ResponseEntity<List<MedicalRecord>> getMedicalRecords() {
+
 		log.info("Retriving all medical records");
-		return medicalRecordService.getMedicalRecords();
+
+		List<MedicalRecord> medicalrecords = medicalRecordService.getMedicalRecords();
+
+		if (!medicalrecords.isEmpty()) {
+			return new ResponseEntity<>(medicalrecords, HttpStatus.OK);
+		} else {
+			log.error("The list is empty");
+			return new ResponseEntity<List<MedicalRecord>>(HttpStatus.NOT_FOUND);
+		}
 	}
 
 	/**
@@ -46,7 +61,7 @@ public class MedicalRecordController {
 
 	@GetMapping("/{id}")
 	public MedicalRecord getMedicalRecord(@PathVariable("id") final String id) {
-		MedicalRecord medicalRecord = null;
+
 		try {
 			log.info("Getting medical Record information with id: " + id);
 			return medicalRecordService.getMedicalRecord(id).get();
@@ -54,18 +69,30 @@ public class MedicalRecordController {
 		} catch (NoSuchElementException e) {
 			log.error("medical Record with id: " + id + " not found " + e);
 		}
-		return medicalRecord;
+		return null;
 
 	}
 
 	@PostMapping
-	public MedicalRecord createfireStation(@RequestBody MedicalRecord medicalRecord) {
+	public ResponseEntity<Void> createfireStation(@RequestBody MedicalRecord medicalRecord) {
 		log.info("Creating fireStation with id: " + medicalRecord.toString());
-		return medicalRecordService.saveMedicalRecord(medicalRecord);
+		try {
+			MedicalRecord medicalRecordAdded = medicalRecordService.saveMedicalRecord(medicalRecord);
+			URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+					.path("/{id}")
+					.buildAndExpand(medicalRecordAdded.getId())
+					.toUri();
+			return ResponseEntity.created(location).build();
+
+		} catch (Exception e) {
+			log.error("Error on medical record creation");
+			return new ResponseEntity<Void>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
 	}
 
 	/**
-	 * Updates a fire station
+	 * Updates a medical record
 	 * 
 	 * @param id
 	 * @param fireStation
@@ -73,9 +100,14 @@ public class MedicalRecordController {
 	 * @throws NoSuchElementException
 	 */
 	@PutMapping("/{id}")
-	public MedicalRecord updateMedicalRecord(@PathVariable("id") final String id,
+	public ResponseEntity<MedicalRecord> updateMedicalRecord(@PathVariable("id") final String id,
 			@RequestBody MedicalRecord medicalRecord)
 			throws NoSuchElementException {
+
+		if (StringUtils.isEmpty(id)) {
+			log.error("Id number is absent for the update");
+			return new ResponseEntity<MedicalRecord>(HttpStatus.BAD_REQUEST);
+		}
 
 		MedicalRecord medicalRecordUpdated = this.getMedicalRecord(id);
 
@@ -88,9 +120,8 @@ public class MedicalRecordController {
 
 		log.info("Updating medical Record information " + medicalRecordUpdated.toString());
 
-		medicalRecordService.saveMedicalRecord(medicalRecordUpdated);
-
-		return medicalRecordUpdated;
+		return new ResponseEntity<MedicalRecord>(medicalRecordService.saveMedicalRecord(medicalRecordUpdated),
+				HttpStatus.OK);
 
 	}
 
@@ -100,9 +131,10 @@ public class MedicalRecordController {
 	 * @param id - The id of the medical Record to delete
 	 */
 	@DeleteMapping("/{id}")
-	public void deletePerson(@PathVariable("id") final String id) {
+	public ResponseEntity<Void> deletePerson(@PathVariable("id") final String id) {
 		log.info("Deleting medical Record with id: " + id);
 		medicalRecordService.deleteMedicalRecord(id);
+		return ResponseEntity.ok().build();
 	}
 
 }

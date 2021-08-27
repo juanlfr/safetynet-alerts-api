@@ -3,7 +3,9 @@ package com.safetynet.safetynetalertsapi.model;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
+@Document(collection = "medicalrecord")
 public class MedicalRecord {
 
 	@Id
