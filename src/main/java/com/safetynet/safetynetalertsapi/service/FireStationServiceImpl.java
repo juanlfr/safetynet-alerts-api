@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +14,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+import com.safetynet.safetynetalertsapi.controller.FireStationController;
+import com.safetynet.safetynetalertsapi.model.FireDTO;
+import com.safetynet.safetynetalertsapi.model.FireFloodDTO;
 import com.safetynet.safetynetalertsapi.model.FireStation;
 import com.safetynet.safetynetalertsapi.model.MedicalRecord;
 import com.safetynet.safetynetalertsapi.model.Person;
@@ -22,6 +27,8 @@ import com.safetynet.safetynetalertsapi.utils.SafetyAlertsNetUtil;
 
 @Service
 public class FireStationServiceImpl implements FireStationService {
+
+	private Logger log = LogManager.getLogger(FireStationController.class);
 
 	@Autowired
 	private FireStationRepository fireStationRepository;
@@ -59,6 +66,7 @@ public class FireStationServiceImpl implements FireStationService {
 		List<MedicalRecord> medicalRecordsChildren = new ArrayList<MedicalRecord>();
 		StationNumberDTO returnedPeopleDTOList = new StationNumberDTO();
 		List<PersonCoveredByStationNumberDTO> peopleCoveredByStationNumber = new ArrayList<PersonCoveredByStationNumberDTO>();
+
 		for (Person person : peopleFiltred) {
 			PersonCoveredByStationNumberDTO personCoveredByStationNumber = new PersonCoveredByStationNumberDTO();
 			personCoveredByStationNumber.setAddress(person.getAddress());
@@ -76,7 +84,6 @@ public class FireStationServiceImpl implements FireStationService {
 					medicalRecordsChildren.add(medicalRecordFound);
 				}
 			}
-
 		}
 		int numberOfChildren = medicalRecordsChildren.size();
 		int totalPeopleFound = peopleFiltred.size();
@@ -124,4 +131,40 @@ public class FireStationServiceImpl implements FireStationService {
 		return peopleFiltred;
 	}
 
+	@Override
+	public FireDTO getPeopleAndFirestationNumbersByAddress(String address) {
+
+		FireStation firestation = fireStationRepository.findFireStationByAdresse(address);
+
+		log.debug("firestation " + firestation);
+
+		if (firestation != null) {
+			FireDTO fireDTO = new FireDTO();
+			fireDTO.setFirestationNumber(firestation.getStation());
+
+			List<Person> people = getPeopleByFirestationNumber(firestation.getStation());
+			List<FireFloodDTO> peopleInFireAndFlood = new ArrayList<FireFloodDTO>();
+			FireFloodDTO fireFloodDTO = new FireFloodDTO();
+
+			for (Person person : people) {
+				fireFloodDTO.setFirstName(person.getFirstName());
+				fireFloodDTO.setLastName(person.getLastName());
+				fireFloodDTO.setPhone(person.getPhone());
+
+				MedicalRecord medicalRecordFound = medicalService.getMedicalRecordByFullName(person.getLastName(),
+						person.getFirstName());
+				if (medicalRecordFound != null) {
+					fireFloodDTO.setMedications(medicalRecordFound.getMedications());
+					fireFloodDTO.setAllergies(medicalRecordFound.getAllergies());
+					fireFloodDTO.setAge(SafetyAlertsNetUtil.ageCalculator(medicalRecordFound));
+				}
+				peopleInFireAndFlood.add(fireFloodDTO);
+			}
+			fireDTO.setPersonInfoInFireOrFloodDTO(peopleInFireAndFlood);
+			return fireDTO;
+		} else {
+			log.info("Firestation not found");
+			return null;
+		}
+	}
 }

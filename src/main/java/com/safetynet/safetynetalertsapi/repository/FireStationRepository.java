@@ -10,4 +10,6 @@ public interface FireStationRepository extends MongoRepository<FireStation, Stri
 
 	List<FireStation> findAllFireStationsByStationNumber(String stationNumber);
 
+	FireStation findFireStationByAdresse(String address);
+
 }
