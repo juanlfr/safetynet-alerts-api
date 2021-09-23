@@ -4,6 +4,8 @@ import java.net.URI;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import javax.websocket.server.PathParam;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.safetynet.safetynetalertsapi.model.ChildAlertDTO;
 import com.safetynet.safetynetalertsapi.model.Person;
 import com.safetynet.safetynetalertsapi.service.PersonService;
 
@@ -123,4 +126,16 @@ public class PersonController {
 		return ResponseEntity.ok().build();
 	}
 
+	@GetMapping("/childAlert")
+	public ResponseEntity<ChildAlertDTO> getChildsByAddress(@PathParam("address") String address) {
+		if (address != null && !address.isEmpty()) {
+			log.info("Finding childs by address: " + address);
+			return new ResponseEntity<ChildAlertDTO>(
+					personService.getPeopleByAddress(address), HttpStatus.OK);
+		} else {
+			log.warn("Address is empty");
+			return new ResponseEntity<ChildAlertDTO>(HttpStatus.BAD_REQUEST);
+		}
+
+	}
 }

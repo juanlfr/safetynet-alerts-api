@@ -128,13 +128,14 @@ public class FireStationController {
 	@GetMapping
 	public ResponseEntity<StationNumberDTO> getPeopleCoveredByStationNumber(
 			@PathParam("stationNumber") String stationNumber) {
-		if (stationNumber != null) {
+		if (stationNumber != null && !stationNumber.isEmpty()) {
+			log.info("Finding people by firestation number: " + stationNumber);
 			return new ResponseEntity<StationNumberDTO>(
-
 					fireStationService.getPeopleCoveredByStationNumber(stationNumber), HttpStatus.OK);
-
+		} else {
+			log.warn("Firestation number is empty");
+			return new ResponseEntity<StationNumberDTO>(HttpStatus.BAD_REQUEST);
 		}
-		return null;
 	}
 
 }

@@ -1,8 +1,5 @@
 package com.safetynet.safetynetalertsapi.service;
 
-import java.time.LocalDate;
-import java.time.Period;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -16,6 +13,7 @@ import com.safetynet.safetynetalertsapi.model.Person;
 import com.safetynet.safetynetalertsapi.model.PersonCoveredByStationNumberDTO;
 import com.safetynet.safetynetalertsapi.model.StationNumberDTO;
 import com.safetynet.safetynetalertsapi.repository.FireStationRepository;
+import com.safetynet.safetynetalertsapi.utils.SafetyAlertsNetUtil;
 
 @Service
 public class FireStationServiceImpl implements FireStationService {
@@ -73,7 +71,7 @@ public class FireStationServiceImpl implements FireStationService {
 					person.getFirstName());
 			if (medicalRecordFound != null) {
 
-				int personsAge = ageCalculator(medicalRecordFound);
+				int personsAge = SafetyAlertsNetUtil.ageCalculator(medicalRecordFound);
 				if (personsAge < 18) {
 					medicalRecordsChildren.add(medicalRecordFound);
 				}
@@ -98,14 +96,6 @@ public class FireStationServiceImpl implements FireStationService {
 		// return peopleFiltred;
 		return returnedPeopleDTOList;
 
-	}
-
-	private static int ageCalculator(MedicalRecord medicalRecordFound) {
-		String stringBirthDate = medicalRecordFound.getBirthdate();
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
-		LocalDate birthDate = LocalDate.parse(stringBirthDate, formatter);
-		int personsAge = Period.between(birthDate, LocalDate.now()).getYears();
-		return personsAge;
 	}
 
 }

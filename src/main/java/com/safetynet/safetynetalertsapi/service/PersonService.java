@@ -5,18 +5,22 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import com.safetynet.safetynetalertsapi.model.ChildAlertDTO;
 import com.safetynet.safetynetalertsapi.model.Person;
 
 @Service
 public interface PersonService {
 
-	public Optional<Person> getPerson(final String id);
+	Optional<Person> getPerson(final String id);
 
-	public List<Person> getPeople();
+	List<Person> getPeople();
 
-	public Person savePerson(Person person);
+	Person savePerson(Person person);
 
-	public void deletePerson(final String id);
+	void deletePerson(final String id);
 
-	public List<Person> getPeopleByAddress(List<String> adresses);
+	List<Person> getPeopleByAddress(List<String> adresses);
+
+	ChildAlertDTO getPeopleByAddress(String address);
+
 }
