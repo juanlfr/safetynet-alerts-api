@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.safetynet.safetynetalertsapi.model.FireStation;
 import com.safetynet.safetynetalertsapi.model.StationNumberDTO;
 
@@ -20,4 +21,6 @@ public interface FireStationService {
 	void deleteFireStation(final String id);
 
 	StationNumberDTO getPeopleCoveredByStationNumber(String stationNumber);
+
+	String getPhoneNumbersByFireStationNumber(String stationNumber) throws JsonProcessingException;
 }

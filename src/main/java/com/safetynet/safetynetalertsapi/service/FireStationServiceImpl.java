@@ -7,6 +7,11 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ser.FilterProvider;
+import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import com.safetynet.safetynetalertsapi.model.FireStation;
 import com.safetynet.safetynetalertsapi.model.MedicalRecord;
 import com.safetynet.safetynetalertsapi.model.Person;
@@ -49,13 +54,8 @@ public class FireStationServiceImpl implements FireStationService {
 	@Override
 	public StationNumberDTO getPeopleCoveredByStationNumber(String stationNumber) {
 
-		List<FireStation> fireStationsFiltred = fireStationRepository.findAllFireStationsByStationNumber(stationNumber);
-		List<String> adresses = new ArrayList<String>();
+		List<Person> peopleFiltred = getPeopleByFirestationNumber(stationNumber);
 
-		for (FireStation fireStation : fireStationsFiltred) {
-			adresses.add(fireStation.getAdresse());
-		}
-		List<Person> peopleFiltred = personService.getPeopleByAddress(adresses);
 		List<MedicalRecord> medicalRecordsChildren = new ArrayList<MedicalRecord>();
 		StationNumberDTO returnedPeopleDTOList = new StationNumberDTO();
 		List<PersonCoveredByStationNumberDTO> peopleCoveredByStationNumber = new ArrayList<PersonCoveredByStationNumberDTO>();
@@ -84,18 +84,44 @@ public class FireStationServiceImpl implements FireStationService {
 		returnedPeopleDTOList.setNumberOfChildren(numberOfChildren);
 		returnedPeopleDTOList.setNumberOfAdults(totalPeopleFound - numberOfChildren);
 
-//			peopleFiltred.stream()
-//			.filter(p -> p.getLastName())
-		// .map(MedicalRecordService::getMedicalRecordByFullName(person.getLastName(),
-		// person.getFirstName()));
-
-		// List<StationNumberDTO>
-
-		// List<People>
-		// medicalService.getPeopleByZone(peopleFiltred)
-		// return peopleFiltred;
 		return returnedPeopleDTOList;
 
+	}
+
+	@Override
+	public String getPhoneNumbersByFireStationNumber(String stationNumber) throws JsonProcessingException {
+
+		List<Person> peopleFiltred = getPeopleByFirestationNumber(stationNumber);
+
+		if (peopleFiltred != null && !peopleFiltred.isEmpty()) {
+
+			SimpleBeanPropertyFilter myFilter = SimpleBeanPropertyFilter.filterOutAllExcept("phone");
+
+			FilterProvider filters = new SimpleFilterProvider().addFilter("FiltreDynamique", myFilter)
+					.setFailOnUnknownId(false);
+
+			ObjectMapper mapper = new ObjectMapper();
+
+			mapper.setFilterProvider(filters);
+
+			String jsonData = mapper.writerWithDefaultPrettyPrinter()
+					.writeValueAsString(peopleFiltred);
+
+			return jsonData;
+		}
+
+		return null;
+
+	}
+
+	private List<Person> getPeopleByFirestationNumber(String stationNumber) {
+		List<FireStation> fireStationsFiltred = fireStationRepository.findAllFireStationsByStationNumber(stationNumber);
+		List<String> adresses = new ArrayList<String>();
+		for (FireStation fireStation : fireStationsFiltred) {
+			adresses.add(fireStation.getAdresse());
+		}
+		List<Person> peopleFiltred = personService.getPeopleByAddress(adresses);
+		return peopleFiltred;
 	}
 
 }

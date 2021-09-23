@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.safetynet.safetynetalertsapi.model.FireStation;
 import com.safetynet.safetynetalertsapi.model.StationNumberDTO;
 import com.safetynet.safetynetalertsapi.service.FireStationService;
@@ -135,6 +136,19 @@ public class FireStationController {
 		} else {
 			log.warn("Firestation number is empty");
 			return new ResponseEntity<StationNumberDTO>(HttpStatus.BAD_REQUEST);
+		}
+	}
+
+	@GetMapping("/phoneAlert")
+	public ResponseEntity<String> getPhoneNumbersByFireStationNumber(
+			@PathParam("firestationNumber") String firestationNumber) throws JsonProcessingException {
+		if (firestationNumber != null && !firestationNumber.isEmpty()) {
+			log.info("Finding Phone Number by firestation number: " + firestationNumber);
+			return new ResponseEntity<String>(
+					fireStationService.getPhoneNumbersByFireStationNumber(firestationNumber), HttpStatus.OK);
+		} else {
+			log.warn("Firestation number is empty");
+			return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
 		}
 	}
 

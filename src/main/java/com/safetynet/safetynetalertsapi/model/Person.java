@@ -5,6 +5,9 @@ import javax.validation.constraints.NotNull;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
+
+@JsonFilter("FiltreDynamique")
 @Document
 public class Person {
 
