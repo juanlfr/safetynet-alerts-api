@@ -4,12 +4,14 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 @Document(collection = "firestation")
 public class FireStation {
 
 	@Id
 	private String id;
-
+	@JsonProperty("address")
 	@Field("address")
 	private String adresse;
 	@Field("station")

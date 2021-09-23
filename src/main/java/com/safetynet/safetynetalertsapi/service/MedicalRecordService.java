@@ -18,4 +18,6 @@ public interface MedicalRecordService {
 
 	public void deleteMedicalRecord(final String id);
 
+	public MedicalRecord getMedicalRecordByFullName(String lastName, String firstName);
+
 }

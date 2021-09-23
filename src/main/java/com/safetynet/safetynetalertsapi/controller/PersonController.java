@@ -45,8 +45,8 @@ public class PersonController {
 			return new ResponseEntity<>(people, HttpStatus.OK);
 		} else {
 			log.error("The list is empty");
-			return new ResponseEntity<List<Person>>(HttpStatus.NOT_FOUND);
 		}
+		return null;
 
 	}
 

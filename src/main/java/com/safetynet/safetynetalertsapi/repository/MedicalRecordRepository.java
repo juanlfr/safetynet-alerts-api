@@ -6,4 +6,6 @@ import com.safetynet.safetynetalertsapi.model.MedicalRecord;
 
 public interface MedicalRecordRepository extends MongoRepository<MedicalRecord, String> {
 
+	MedicalRecord findByLastNameAndFirstName(String lastName, String firstName);
+
 }

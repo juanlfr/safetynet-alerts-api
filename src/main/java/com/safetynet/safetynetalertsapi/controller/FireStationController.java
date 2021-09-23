@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.safetynet.safetynetalertsapi.model.FireStation;
+import com.safetynet.safetynetalertsapi.model.StationNumberDTO;
 import com.safetynet.safetynetalertsapi.service.FireStationService;
 
 @RestController
@@ -124,11 +125,12 @@ public class FireStationController {
 		return ResponseEntity.ok().build();
 	}
 
-	@GetMapping("/firestation")
-	public ResponseEntity<List<FireStation>> getPeopleCoveredByStationNumber(
+	@GetMapping
+	public ResponseEntity<StationNumberDTO> getPeopleCoveredByStationNumber(
 			@PathParam("stationNumber") String stationNumber) {
 		if (stationNumber != null) {
-			return new ResponseEntity<List<FireStation>>(
+			return new ResponseEntity<StationNumberDTO>(
+
 					fireStationService.getPeopleCoveredByStationNumber(stationNumber), HttpStatus.OK);
 
 		}

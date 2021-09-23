@@ -6,17 +6,18 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import com.safetynet.safetynetalertsapi.model.FireStation;
+import com.safetynet.safetynetalertsapi.model.StationNumberDTO;
 
 @Service
 public interface FireStationService {
 
-	public Optional<FireStation> getFireStation(final String id);
+	Optional<FireStation> getFireStation(final String id);
 
-	public List<FireStation> getFireStations();
+	List<FireStation> getFireStations();
 
-	public FireStation saveFireStation(FireStation fireStation);
+	FireStation saveFireStation(FireStation fireStation);
 
-	public void deleteFireStation(final String id);
+	void deleteFireStation(final String id);
 
-	public List<FireStation> getPeopleCoveredByStationNumber(String stationNumber);
+	StationNumberDTO getPeopleCoveredByStationNumber(String stationNumber);
 }

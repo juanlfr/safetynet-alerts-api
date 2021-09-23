@@ -4,6 +4,8 @@ import java.net.URI;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import javax.websocket.server.PathParam;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -135,6 +137,22 @@ public class MedicalRecordController {
 		log.info("Deleting medical Record with id: " + id);
 		medicalRecordService.deleteMedicalRecord(id);
 		return ResponseEntity.ok().build();
+	}
+
+	@GetMapping
+	public ResponseEntity<MedicalRecord> getPeopleCoveredByStationNumber(@PathParam("lastName") String lastName,
+			@PathParam("firstName") String firstName) {
+
+		log.info("Retriving some medical records");
+
+		MedicalRecord medicalrecords = medicalRecordService.getMedicalRecordByFullName(lastName, firstName);
+
+		if (medicalrecords != null) {
+			return new ResponseEntity<>(medicalrecords, HttpStatus.OK);
+		} else {
+			log.error("The list is empty");
+			return new ResponseEntity<MedicalRecord>(HttpStatus.NOT_FOUND);
+		}
 	}
 
 }

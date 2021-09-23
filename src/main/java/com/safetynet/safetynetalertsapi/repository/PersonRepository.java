@@ -10,6 +10,6 @@ import com.safetynet.safetynetalertsapi.model.Person;
 @Repository
 public interface PersonRepository extends MongoRepository<Person, String> {
 
-	List<Person> findAllPeopleByAddress(List<String> adresses);
+	List<Person> findAllPeopleByAddressIn(List<String> adresses);
 
 }

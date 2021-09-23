@@ -38,7 +38,7 @@ public class PersonServiceImpl implements PersonService {
 
 	@Override
 	public List<Person> getPeopleByAddress(List<String> adresses) {
-		return personRepository.findAllPeopleByAddress(adresses);
+		return personRepository.findAllPeopleByAddressIn(adresses);
 	}
 
 }

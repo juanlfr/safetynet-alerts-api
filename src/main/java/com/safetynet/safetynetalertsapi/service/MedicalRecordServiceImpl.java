@@ -35,4 +35,11 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 		medicalRecordRepository.deleteById(id);
 	}
 
+	@Override
+	public MedicalRecord getMedicalRecordByFullName(String lastName, String firstName) {
+		MedicalRecord medicalrecords = medicalRecordRepository.findByLastNameAndFirstName(lastName,
+				firstName);
+		return medicalrecords;
+	}
+
 }
