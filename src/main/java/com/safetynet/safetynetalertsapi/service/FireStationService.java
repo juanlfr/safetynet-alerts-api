@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.safetynet.safetynetalertsapi.model.FireDTO;
 import com.safetynet.safetynetalertsapi.model.FireStation;
+import com.safetynet.safetynetalertsapi.model.FloodDTO;
 import com.safetynet.safetynetalertsapi.model.StationNumberDTO;
 
 @Service
@@ -26,4 +27,6 @@ public interface FireStationService {
 	String getPhoneNumbersByFireStationNumber(String stationNumber) throws JsonProcessingException;
 
 	FireDTO getPeopleAndFirestationNumbersByAddress(String address);
+
+	List<FloodDTO> getPeopleByStationsNumbers(List<String> stations);
 }

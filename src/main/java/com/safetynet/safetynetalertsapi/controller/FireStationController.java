@@ -18,12 +18,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.safetynet.safetynetalertsapi.model.FireDTO;
 import com.safetynet.safetynetalertsapi.model.FireStation;
+import com.safetynet.safetynetalertsapi.model.FloodDTO;
 import com.safetynet.safetynetalertsapi.model.StationNumberDTO;
 import com.safetynet.safetynetalertsapi.service.FireStationService;
 
@@ -155,7 +157,7 @@ public class FireStationController {
 
 	@GetMapping("/fire")
 	public ResponseEntity<FireDTO> getPeopleAndFirestationNumbersByAddress(
-			@PathParam("address") String address) throws JsonProcessingException {
+			@PathParam("address") String address) {
 		if (address != null && !address.isEmpty()) {
 			log.info("Finding people by addres: " + address);
 			return new ResponseEntity<FireDTO>(
@@ -163,6 +165,19 @@ public class FireStationController {
 		} else {
 			log.warn("Firestation number is empty");
 			return new ResponseEntity<FireDTO>(HttpStatus.BAD_REQUEST);
+		}
+	}
+
+	@GetMapping("/flood/stations")
+	public ResponseEntity<List<FloodDTO>> getPeopleByStationsNumbers(
+			@RequestParam("stations") List<String> stations) {
+		log.info("Finding people by the stations: " + stations);
+		if (stations != null && !stations.isEmpty()) {
+			return new ResponseEntity<List<FloodDTO>>(
+					fireStationService.getPeopleByStationsNumbers(stations), HttpStatus.OK);
+		} else {
+			log.warn("Firestation number is empty");
+			return new ResponseEntity<List<FloodDTO>>(HttpStatus.BAD_REQUEST);
 		}
 	}
 

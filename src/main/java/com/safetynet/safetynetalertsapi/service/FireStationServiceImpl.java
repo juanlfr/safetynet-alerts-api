@@ -18,11 +18,13 @@ import com.safetynet.safetynetalertsapi.controller.FireStationController;
 import com.safetynet.safetynetalertsapi.model.FireDTO;
 import com.safetynet.safetynetalertsapi.model.FireFloodDTO;
 import com.safetynet.safetynetalertsapi.model.FireStation;
+import com.safetynet.safetynetalertsapi.model.FloodDTO;
 import com.safetynet.safetynetalertsapi.model.MedicalRecord;
 import com.safetynet.safetynetalertsapi.model.Person;
 import com.safetynet.safetynetalertsapi.model.PersonCoveredByStationNumberDTO;
 import com.safetynet.safetynetalertsapi.model.StationNumberDTO;
 import com.safetynet.safetynetalertsapi.repository.FireStationRepository;
+import com.safetynet.safetynetalertsapi.repository.PersonRepository;
 import com.safetynet.safetynetalertsapi.utils.SafetyAlertsNetUtil;
 
 @Service
@@ -36,6 +38,8 @@ public class FireStationServiceImpl implements FireStationService {
 	private PersonService personService;
 	@Autowired
 	private MedicalRecordService medicalService;
+	@Autowired
+	private PersonRepository personRepository;
 
 	@Override
 	public Optional<FireStation> getFireStation(String id) {
@@ -147,17 +151,7 @@ public class FireStationServiceImpl implements FireStationService {
 			FireFloodDTO fireFloodDTO = new FireFloodDTO();
 
 			for (Person person : people) {
-				fireFloodDTO.setFirstName(person.getFirstName());
-				fireFloodDTO.setLastName(person.getLastName());
-				fireFloodDTO.setPhone(person.getPhone());
-
-				MedicalRecord medicalRecordFound = medicalService.getMedicalRecordByFullName(person.getLastName(),
-						person.getFirstName());
-				if (medicalRecordFound != null) {
-					fireFloodDTO.setMedications(medicalRecordFound.getMedications());
-					fireFloodDTO.setAllergies(medicalRecordFound.getAllergies());
-					fireFloodDTO.setAge(SafetyAlertsNetUtil.ageCalculator(medicalRecordFound));
-				}
+				setFireFloodDTO(fireFloodDTO, person);
 				peopleInFireAndFlood.add(fireFloodDTO);
 			}
 			fireDTO.setPersonInfoInFireOrFloodDTO(peopleInFireAndFlood);
@@ -166,5 +160,59 @@ public class FireStationServiceImpl implements FireStationService {
 			log.info("Firestation not found");
 			return null;
 		}
+	}
+
+	private void setFireFloodDTO(FireFloodDTO fireFloodDTO, Person person) {
+
+		fireFloodDTO.setFirstName(person.getFirstName());
+		fireFloodDTO.setLastName(person.getLastName());
+		fireFloodDTO.setPhone(person.getPhone());
+
+		MedicalRecord medicalRecordFound = medicalService.getMedicalRecordByFullName(person.getLastName(),
+				person.getFirstName());
+		if (medicalRecordFound != null) {
+			fireFloodDTO.setMedications(medicalRecordFound.getMedications());
+			fireFloodDTO.setAllergies(medicalRecordFound.getAllergies());
+			fireFloodDTO.setAge(SafetyAlertsNetUtil.ageCalculator(medicalRecordFound));
+		}
+	}
+
+	@Override
+	public List<FloodDTO> getPeopleByStationsNumbers(List<String> stations) {
+
+		List<FloodDTO> floodDTOlist = new ArrayList<FloodDTO>();
+
+		for (String stationNumber : stations) {
+			List<FireStation> fireStationsFiltred = fireStationRepository
+					.findAllFireStationsByStationNumber(stationNumber);
+			for (FireStation fireStation : fireStationsFiltred) {
+				FloodDTO floodDTO = new FloodDTO();
+				List<FireFloodDTO> fireFloodDTOlist = new ArrayList<FireFloodDTO>();
+				floodDTO.setAddress(fireStation.getAdresse());
+				List<Person> people = personRepository.findAllPeopleByAddress(fireStation.getAdresse());
+				for (Person person : people) {
+					FireFloodDTO fireFloodDTO = new FireFloodDTO();
+					setFireFloodDTO(fireFloodDTO, person);
+					fireFloodDTOlist.add(fireFloodDTO);
+				}
+				floodDTO.setPersonInfoInFireOrFloodDTO(fireFloodDTOlist);
+				floodDTOlist.add(floodDTO);
+			}
+		}
+
+//		for (String stationNumber : stations) {
+//			List<Person> people = getPeopleByFirestationNumber(stationNumber);
+//			for (Person person : people) {
+//				floodDTO.setAddress(person.getAddress());
+//				FireFloodDTO fireFloodDTO = new FireFloodDTO();
+//				setFireFloodDTO(fireFloodDTO, person);
+//				fireFloodDTOlist.add(fireFloodDTO);
+//				floodDTO.setPersonInfoInFireOrFloodDTO(fireFloodDTOlist);
+//				floodDTOlist.add(floodDTO);
+//			}
+//		}
+
+		return floodDTOlist;
+
 	}
 }
