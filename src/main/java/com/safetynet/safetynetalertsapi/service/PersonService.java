@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.safetynet.safetynetalertsapi.model.ChildAlertDTO;
 import com.safetynet.safetynetalertsapi.model.Person;
+import com.safetynet.safetynetalertsapi.model.PersonInfoDTO;
 
 @Service
 public interface PersonService {
@@ -22,5 +23,7 @@ public interface PersonService {
 	List<Person> getPeopleByAddress(List<String> adresses);
 
 	ChildAlertDTO getPeopleByAddress(String address);
+
+	List<PersonInfoDTO> getPeopleByName(String lastName);
 
 }

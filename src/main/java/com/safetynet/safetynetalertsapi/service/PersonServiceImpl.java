@@ -13,6 +13,7 @@ import com.safetynet.safetynetalertsapi.controller.PersonController;
 import com.safetynet.safetynetalertsapi.model.ChildAlertDTO;
 import com.safetynet.safetynetalertsapi.model.MedicalRecord;
 import com.safetynet.safetynetalertsapi.model.Person;
+import com.safetynet.safetynetalertsapi.model.PersonInfoDTO;
 import com.safetynet.safetynetalertsapi.repository.PersonRepository;
 import com.safetynet.safetynetalertsapi.utils.SafetyAlertsNetUtil;
 
@@ -100,6 +101,29 @@ public class PersonServiceImpl implements PersonService {
 		log.info("People not found at address: " + address);
 		return null;
 
+	}
+
+	@Override
+	public List<PersonInfoDTO> getPeopleByName(String lastName) {
+
+		List<Person> people = personRepository.findAllPeopleByLastName(lastName);
+		List<PersonInfoDTO> personInfoDTOList = new ArrayList<PersonInfoDTO>();
+		for (Person person : people) {
+
+			PersonInfoDTO personInfoDTO = new PersonInfoDTO();
+			personInfoDTO.setFirstName(person.getFirstName());
+			personInfoDTO.setLastName(person.getLastName());
+			MedicalRecord medicalRecordFound = medicalService.getMedicalRecordByFullName(person.getLastName(),
+					person.getFirstName());
+			personInfoDTO.setAddress(person.getAddress());
+			personInfoDTO.setEmail(person.getEmail());
+			personInfoDTO.setMedications(medicalRecordFound.getMedications());
+			personInfoDTO.setAge(SafetyAlertsNetUtil.ageCalculator(medicalRecordFound));
+			personInfoDTOList.add(personInfoDTO);
+
+		}
+
+		return personInfoDTOList;
 	}
 
 }

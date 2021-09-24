@@ -14,4 +14,6 @@ public interface PersonRepository extends MongoRepository<Person, String> {
 
 	List<Person> findAllPeopleByAddress(String address);
 
+	List<Person> findAllPeopleByLastName(String lastName);
+
 }

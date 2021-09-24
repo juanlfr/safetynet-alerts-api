@@ -23,6 +23,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.safetynet.safetynetalertsapi.model.ChildAlertDTO;
 import com.safetynet.safetynetalertsapi.model.Person;
+import com.safetynet.safetynetalertsapi.model.PersonInfoDTO;
 import com.safetynet.safetynetalertsapi.service.PersonService;
 
 @RestController
@@ -135,6 +136,20 @@ public class PersonController {
 		} else {
 			log.warn("Address is empty");
 			return new ResponseEntity<ChildAlertDTO>(HttpStatus.BAD_REQUEST);
+		}
+
+	}
+
+	@GetMapping("/personInfo")
+	public ResponseEntity<List<PersonInfoDTO>> getPeopleByName(@PathParam("firstName") String firstName,
+			@PathParam("lastName") String lastName) {
+		if (lastName != null && !lastName.isEmpty()) {
+			log.info("Finding people by first name and last name: " + firstName + lastName);
+			return new ResponseEntity<List<PersonInfoDTO>>(
+					personService.getPeopleByName(lastName), HttpStatus.OK);
+		} else {
+			log.warn("lastName is empty");
+			return new ResponseEntity<List<PersonInfoDTO>>(HttpStatus.BAD_REQUEST);
 		}
 
 	}
