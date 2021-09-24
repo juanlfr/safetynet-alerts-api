@@ -3,13 +3,14 @@ package com.safetynet.safetynetalertsapi.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.safetynet.safetynetalertsapi.model.FireDTO;
 import com.safetynet.safetynetalertsapi.model.FireStation;
-import com.safetynet.safetynetalertsapi.model.FloodDTO;
-import com.safetynet.safetynetalertsapi.model.StationNumberDTO;
+import com.safetynet.safetynetalertsapi.model.DTO.FireDTO;
+import com.safetynet.safetynetalertsapi.model.DTO.FloodDTO;
+import com.safetynet.safetynetalertsapi.model.DTO.StationNumberDTO;
 
 @Service
 public interface FireStationService {
@@ -24,7 +25,7 @@ public interface FireStationService {
 
 	StationNumberDTO getPeopleCoveredByStationNumber(String stationNumber);
 
-	String getPhoneNumbersByFireStationNumber(String stationNumber) throws JsonProcessingException;
+	MappingJacksonValue getPhoneNumbersByFireStationNumber(String stationNumber) throws JsonProcessingException;
 
 	FireDTO getPeopleAndFirestationNumbersByAddress(String address);
 

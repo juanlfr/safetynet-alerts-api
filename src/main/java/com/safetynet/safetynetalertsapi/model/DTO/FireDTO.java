@@ -1,14 +1,13 @@
-package com.safetynet.safetynetalertsapi.model;
+package com.safetynet.safetynetalertsapi.model.DTO;
 
 import java.util.List;
 
 public class FireDTO {
 
-	private List<FireFloodDTO> personInfoInFireOrFloodDTO;
 	private String firestationNumber;
+	private List<FireFloodDTO> personInfoInFireOrFloodDTO;
 
 	public FireDTO() {
-		// TODO Auto-generated constructor stub
 	}
 
 	public List<FireFloodDTO> getPersonInfoInFireOrFloodDTO() {

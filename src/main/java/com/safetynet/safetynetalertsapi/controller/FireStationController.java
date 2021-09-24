@@ -11,6 +11,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,10 +24,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.safetynet.safetynetalertsapi.model.FireDTO;
 import com.safetynet.safetynetalertsapi.model.FireStation;
-import com.safetynet.safetynetalertsapi.model.FloodDTO;
-import com.safetynet.safetynetalertsapi.model.StationNumberDTO;
+import com.safetynet.safetynetalertsapi.model.DTO.FireDTO;
+import com.safetynet.safetynetalertsapi.model.DTO.FloodDTO;
+import com.safetynet.safetynetalertsapi.model.DTO.StationNumberDTO;
 import com.safetynet.safetynetalertsapi.service.FireStationService;
 
 @RestController
@@ -143,15 +144,15 @@ public class FireStationController {
 	}
 
 	@GetMapping("/phoneAlert")
-	public ResponseEntity<String> getPhoneNumbersByFireStationNumber(
+	public ResponseEntity<MappingJacksonValue> getPhoneNumbersByFireStationNumber(
 			@PathParam("firestationNumber") String firestationNumber) throws JsonProcessingException {
 		if (firestationNumber != null && !firestationNumber.isEmpty()) {
 			log.info("Finding Phone Number by firestation number: " + firestationNumber);
-			return new ResponseEntity<String>(
+			return new ResponseEntity<MappingJacksonValue>(
 					fireStationService.getPhoneNumbersByFireStationNumber(firestationNumber), HttpStatus.OK);
 		} else {
 			log.warn("Firestation number is empty");
-			return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<MappingJacksonValue>(HttpStatus.BAD_REQUEST);
 		}
 	}
 

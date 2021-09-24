@@ -7,13 +7,18 @@ import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.ser.FilterProvider;
+import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import com.safetynet.safetynetalertsapi.controller.PersonController;
-import com.safetynet.safetynetalertsapi.model.ChildAlertDTO;
 import com.safetynet.safetynetalertsapi.model.MedicalRecord;
 import com.safetynet.safetynetalertsapi.model.Person;
-import com.safetynet.safetynetalertsapi.model.PersonInfoDTO;
+import com.safetynet.safetynetalertsapi.model.DTO.ChildAlertDTO;
+import com.safetynet.safetynetalertsapi.model.DTO.ChildDTO;
+import com.safetynet.safetynetalertsapi.model.DTO.PersonInfoDTO;
 import com.safetynet.safetynetalertsapi.repository.PersonRepository;
 import com.safetynet.safetynetalertsapi.utils.SafetyAlertsNetUtil;
 
@@ -57,7 +62,8 @@ public class PersonServiceImpl implements PersonService {
 	public ChildAlertDTO getPeopleByAddress(String address) {
 
 		List<Person> peopleFiltredByAddress = personRepository.findAllPeopleByAddress(address);
-		ChildAlertDTO childDTO = new ChildAlertDTO();
+		ChildAlertDTO childAlertDTO = new ChildAlertDTO();
+		List<ChildDTO> childs = new ArrayList<ChildDTO>();
 
 		if (peopleFiltredByAddress != null && !peopleFiltredByAddress.isEmpty()) {
 
@@ -65,37 +71,39 @@ public class PersonServiceImpl implements PersonService {
 
 			for (Person person : peopleFiltredByAddress) {
 
-				Person personFound = new Person();
-				personFound.setFirstName(person.getFirstName());
-				personFound.setLastName(person.getLastName());
-				personFound.setAddress(person.getAddress());
-				personFound.setPhone(person.getPhone());
-				personFound.setCity(person.getCity());
-				personFound.setEmail(person.getEmail());
-				personFound.setZip(person.getZip());
-
-				MedicalRecord medicalRecordFound = medicalService.getMedicalRecordByFullName(personFound.getLastName(),
-						personFound.getFirstName());
+				MedicalRecord medicalRecordFound = medicalService.getMedicalRecordByFullName(person.getLastName(),
+						person.getFirstName());
 
 				if (medicalRecordFound != null) {
 					int personsAge = SafetyAlertsNetUtil.ageCalculator(medicalRecordFound);
 					if (personsAge <= 18) {
-						childDTO.setFirstName(personFound.getFirstName());
-						childDTO.setLastName(personFound.getLastName());
+						ChildDTO childDTO = new ChildDTO();
+						childDTO.setFirstName(person.getFirstName());
+						childDTO.setLastName(person.getLastName());
 						childDTO.setAge(personsAge);
+						childs.add(childDTO);
 					} else {
+						Person personFound = new Person();
+						personFound.setFirstName(person.getFirstName());
+						personFound.setLastName(person.getLastName());
+						personFound.setAddress(person.getAddress());
+						personFound.setPhone(person.getPhone());
+						personFound.setCity(person.getCity());
+						personFound.setEmail(person.getEmail());
+						personFound.setZip(person.getZip());
 						houseHoldMembers.add(personFound);
-						childDTO.setHouseHoldMembers(houseHoldMembers);
 					}
 				} else {
 					log.info("medical record not found");
 				}
 			}
-			if (childDTO.getFirstName() == null) {
+			childAlertDTO.setChilds(childs);
+			childAlertDTO.setHouseHoldMembers(houseHoldMembers);
+			if (childs.isEmpty()) {
 				log.info("No childs founded at the address: " + address);
 				return null;
 			} else {
-				return childDTO;
+				return childAlertDTO;
 			}
 		}
 		log.info("People not found at address: " + address);
@@ -124,6 +132,26 @@ public class PersonServiceImpl implements PersonService {
 		}
 
 		return personInfoDTOList;
+	}
+
+	@Override
+	public MappingJacksonValue getEmailByCity(String city) {
+		List<Person> peopleFiltred = personRepository.findAllPeopleByCity(city);
+		if (peopleFiltred != null && !peopleFiltred.isEmpty()) {
+
+			SimpleBeanPropertyFilter myFilter = SimpleBeanPropertyFilter.filterOutAllExcept("email");
+
+			FilterProvider filters = new SimpleFilterProvider().addFilter("FiltreDynamique", myFilter)
+					.setFailOnUnknownId(false);
+
+			MappingJacksonValue filtredProp = new MappingJacksonValue(peopleFiltred);
+
+			filtredProp.setFilters(filters);
+
+			return filtredProp;
+		}
+
+		return null;
 	}
 
 }

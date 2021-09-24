@@ -3,11 +3,12 @@ package com.safetynet.safetynetalertsapi.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.stereotype.Service;
 
-import com.safetynet.safetynetalertsapi.model.ChildAlertDTO;
 import com.safetynet.safetynetalertsapi.model.Person;
-import com.safetynet.safetynetalertsapi.model.PersonInfoDTO;
+import com.safetynet.safetynetalertsapi.model.DTO.ChildAlertDTO;
+import com.safetynet.safetynetalertsapi.model.DTO.PersonInfoDTO;
 
 @Service
 public interface PersonService {
@@ -25,5 +26,7 @@ public interface PersonService {
 	ChildAlertDTO getPeopleByAddress(String address);
 
 	List<PersonInfoDTO> getPeopleByName(String lastName);
+
+	MappingJacksonValue getEmailByCity(String city);
 
 }

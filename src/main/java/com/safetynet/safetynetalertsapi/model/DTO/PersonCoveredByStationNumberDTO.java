@@ -1,4 +1,4 @@
-package com.safetynet.safetynetalertsapi.model;
+package com.safetynet.safetynetalertsapi.model.DTO;
 
 public class PersonCoveredByStationNumberDTO {
 	private String firstName;

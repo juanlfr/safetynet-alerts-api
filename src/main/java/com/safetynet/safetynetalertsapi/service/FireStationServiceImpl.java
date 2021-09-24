@@ -7,22 +7,22 @@ import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import com.safetynet.safetynetalertsapi.controller.FireStationController;
-import com.safetynet.safetynetalertsapi.model.FireDTO;
-import com.safetynet.safetynetalertsapi.model.FireFloodDTO;
 import com.safetynet.safetynetalertsapi.model.FireStation;
-import com.safetynet.safetynetalertsapi.model.FloodDTO;
 import com.safetynet.safetynetalertsapi.model.MedicalRecord;
 import com.safetynet.safetynetalertsapi.model.Person;
-import com.safetynet.safetynetalertsapi.model.PersonCoveredByStationNumberDTO;
-import com.safetynet.safetynetalertsapi.model.StationNumberDTO;
+import com.safetynet.safetynetalertsapi.model.DTO.FireDTO;
+import com.safetynet.safetynetalertsapi.model.DTO.FireFloodDTO;
+import com.safetynet.safetynetalertsapi.model.DTO.FloodDTO;
+import com.safetynet.safetynetalertsapi.model.DTO.PersonCoveredByStationNumberDTO;
+import com.safetynet.safetynetalertsapi.model.DTO.StationNumberDTO;
 import com.safetynet.safetynetalertsapi.repository.FireStationRepository;
 import com.safetynet.safetynetalertsapi.repository.PersonRepository;
 import com.safetynet.safetynetalertsapi.utils.SafetyAlertsNetUtil;
@@ -100,7 +100,7 @@ public class FireStationServiceImpl implements FireStationService {
 	}
 
 	@Override
-	public String getPhoneNumbersByFireStationNumber(String stationNumber) throws JsonProcessingException {
+	public MappingJacksonValue getPhoneNumbersByFireStationNumber(String stationNumber) throws JsonProcessingException {
 
 		List<Person> peopleFiltred = getPeopleByFirestationNumber(stationNumber);
 
@@ -111,14 +111,11 @@ public class FireStationServiceImpl implements FireStationService {
 			FilterProvider filters = new SimpleFilterProvider().addFilter("FiltreDynamique", myFilter)
 					.setFailOnUnknownId(false);
 
-			ObjectMapper mapper = new ObjectMapper();
+			MappingJacksonValue filtredProp = new MappingJacksonValue(peopleFiltred);
 
-			mapper.setFilterProvider(filters);
+			filtredProp.setFilters(filters);
 
-			String jsonData = mapper.writerWithDefaultPrettyPrinter()
-					.writeValueAsString(peopleFiltred);
-
-			return jsonData;
+			return filtredProp;
 		}
 
 		return null;
@@ -199,18 +196,6 @@ public class FireStationServiceImpl implements FireStationService {
 				floodDTOlist.add(floodDTO);
 			}
 		}
-
-//		for (String stationNumber : stations) {
-//			List<Person> people = getPeopleByFirestationNumber(stationNumber);
-//			for (Person person : people) {
-//				floodDTO.setAddress(person.getAddress());
-//				FireFloodDTO fireFloodDTO = new FireFloodDTO();
-//				setFireFloodDTO(fireFloodDTO, person);
-//				fireFloodDTOlist.add(fireFloodDTO);
-//				floodDTO.setPersonInfoInFireOrFloodDTO(fireFloodDTOlist);
-//				floodDTOlist.add(floodDTO);
-//			}
-//		}
 
 		return floodDTOlist;
 

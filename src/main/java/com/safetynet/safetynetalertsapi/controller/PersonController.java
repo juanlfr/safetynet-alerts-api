@@ -11,6 +11,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,9 +22,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.safetynet.safetynetalertsapi.model.ChildAlertDTO;
+import com.fasterxml.jackson.databind.ser.FilterProvider;
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import com.safetynet.safetynetalertsapi.model.Person;
-import com.safetynet.safetynetalertsapi.model.PersonInfoDTO;
+import com.safetynet.safetynetalertsapi.model.DTO.ChildAlertDTO;
+import com.safetynet.safetynetalertsapi.model.DTO.PersonInfoDTO;
 import com.safetynet.safetynetalertsapi.service.PersonService;
 
 @RestController
@@ -128,14 +131,23 @@ public class PersonController {
 	}
 
 	@GetMapping("/childAlert")
-	public ResponseEntity<ChildAlertDTO> getChildsByAddress(@PathParam("address") String address) {
+	public ResponseEntity<MappingJacksonValue> getChildsByAddress(@PathParam("address") String address) {
 		if (address != null && !address.isEmpty()) {
 			log.info("Finding childs by address: " + address);
-			return new ResponseEntity<ChildAlertDTO>(
-					personService.getPeopleByAddress(address), HttpStatus.OK);
+
+			ChildAlertDTO childAlertDTO = personService.getPeopleByAddress(address);
+			if (childAlertDTO != null) {
+				FilterProvider filters = new SimpleFilterProvider().setFailOnUnknownId(false);
+				MappingJacksonValue ChildResponseDTO = new MappingJacksonValue(childAlertDTO);
+				ChildResponseDTO.setFilters(filters);
+				return new ResponseEntity<MappingJacksonValue>(ChildResponseDTO, HttpStatus.OK);
+			} else {
+				log.warn("No childs founded");
+				return null;
+			}
 		} else {
 			log.warn("Address is empty");
-			return new ResponseEntity<ChildAlertDTO>(HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<MappingJacksonValue>(HttpStatus.BAD_REQUEST);
 		}
 
 	}
@@ -150,6 +162,20 @@ public class PersonController {
 		} else {
 			log.warn("lastName is empty");
 			return new ResponseEntity<List<PersonInfoDTO>>(HttpStatus.BAD_REQUEST);
+		}
+
+	}
+
+	@GetMapping("/communityEmail")
+	public ResponseEntity<MappingJacksonValue> getEmailByCity(@PathParam("city") String city) {
+
+		if (city != null && !city.isEmpty()) {
+			log.info("Finding email by city: " + city);
+			return new ResponseEntity<MappingJacksonValue>(
+					personService.getEmailByCity(city), HttpStatus.OK);
+		} else {
+			log.warn("city is empty");
+			return new ResponseEntity<MappingJacksonValue>(HttpStatus.BAD_REQUEST);
 		}
 
 	}
