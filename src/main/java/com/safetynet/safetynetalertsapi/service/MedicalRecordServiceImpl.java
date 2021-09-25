@@ -42,4 +42,9 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 		return medicalrecords;
 	}
 
+	@Override
+	public void saveAll(List<MedicalRecord> medicalRecords) {
+		medicalRecordRepository.saveAll(medicalRecords);
+	}
+
 }

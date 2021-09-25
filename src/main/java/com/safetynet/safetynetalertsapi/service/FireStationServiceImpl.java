@@ -201,4 +201,10 @@ public class FireStationServiceImpl implements FireStationService {
 		return floodDTOlist;
 
 	}
+
+	@Override
+	public void saveAll(List<FireStation> fireStations) {
+		fireStationRepository.saveAll(fireStations);
+
+	}
 }

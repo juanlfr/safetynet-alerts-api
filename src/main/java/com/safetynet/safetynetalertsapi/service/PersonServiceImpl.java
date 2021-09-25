@@ -169,4 +169,10 @@ public class PersonServiceImpl implements PersonService {
 		personInfoDTO.setAge(SafetyAlertsNetUtil.ageCalculator(medicalRecordFound));
 		personInfoDTOList.add(personInfoDTO);
 	}
+
+	@Override
+	public void saveAll(List<Person> people) {
+		personRepository.saveAll(people);
+
+	}
 }

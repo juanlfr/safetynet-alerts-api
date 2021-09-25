@@ -29,4 +29,6 @@ public interface PersonService {
 
 	MappingJacksonValue getEmailByCity(String city);
 
+	void saveAll(List<Person> people);
+
 }

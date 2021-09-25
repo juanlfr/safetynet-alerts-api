@@ -30,4 +30,6 @@ public interface FireStationService {
 	FireDTO getPeopleAndFirestationNumbersByAddress(String address);
 
 	List<FloodDTO> getPeopleByStationsNumbers(List<String> stations);
+
+	void saveAll(List<FireStation> fireStations);
 }

@@ -44,17 +44,17 @@ public class PersonController {
 	 * @return - A List object of people full filled
 	 */
 	@GetMapping("/people")
-	public ResponseEntity<List<Person>> getPeople() {
+	public ResponseEntity<MappingJacksonValue> getPeople() {
 		log.info("*************" + "call to Person controller: method getPeople" + "****************");
 
 		List<Person> people = personService.getPeople();
-		if (!people.isEmpty()) {
-			return new ResponseEntity<>(people, HttpStatus.OK);
+		if (people != null && !people.isEmpty()) {
+			MappingJacksonValue responseDTO = setFiltersToFalse(people);
+			return new ResponseEntity<MappingJacksonValue>(responseDTO, HttpStatus.OK);
 		} else {
-			log.error("The list is empty");
+			log.warn("No people founded");
+			return null;
 		}
-		return null;
-
 	}
 
 	/**
@@ -137,10 +137,8 @@ public class PersonController {
 
 			ChildAlertDTO childAlertDTO = personService.getPeopleByAddress(address);
 			if (childAlertDTO != null) {
-				FilterProvider filters = new SimpleFilterProvider().setFailOnUnknownId(false);
-				MappingJacksonValue ChildResponseDTO = new MappingJacksonValue(childAlertDTO);
-				ChildResponseDTO.setFilters(filters);
-				return new ResponseEntity<MappingJacksonValue>(ChildResponseDTO, HttpStatus.OK);
+				MappingJacksonValue responseDTO = setFiltersToFalse(childAlertDTO);
+				return new ResponseEntity<MappingJacksonValue>(responseDTO, HttpStatus.OK);
 			} else {
 				log.warn("No childs founded");
 				return null;
@@ -178,5 +176,12 @@ public class PersonController {
 			return new ResponseEntity<MappingJacksonValue>(HttpStatus.BAD_REQUEST);
 		}
 
+	}
+
+	private MappingJacksonValue setFiltersToFalse(Object o) {
+		FilterProvider filters = new SimpleFilterProvider().setFailOnUnknownId(false);
+		MappingJacksonValue responseDTO = new MappingJacksonValue(o);
+		responseDTO.setFilters(filters);
+		return responseDTO;
 	}
 }

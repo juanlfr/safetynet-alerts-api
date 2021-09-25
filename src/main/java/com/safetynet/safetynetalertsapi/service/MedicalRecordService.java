@@ -10,14 +10,16 @@ import com.safetynet.safetynetalertsapi.model.MedicalRecord;
 @Service
 public interface MedicalRecordService {
 
-	public Optional<MedicalRecord> getMedicalRecord(final String id);
+	Optional<MedicalRecord> getMedicalRecord(final String id);
 
-	public List<MedicalRecord> getMedicalRecords();
+	List<MedicalRecord> getMedicalRecords();
 
-	public MedicalRecord saveMedicalRecord(MedicalRecord medicalRecord);
+	MedicalRecord saveMedicalRecord(MedicalRecord medicalRecord);
 
-	public void deleteMedicalRecord(final String id);
+	void deleteMedicalRecord(final String id);
 
-	public MedicalRecord getMedicalRecordByFullName(String lastName, String firstName);
+	MedicalRecord getMedicalRecordByFullName(String lastName, String firstName);
+
+	void saveAll(List<MedicalRecord> medicalRecords);
 
 }
