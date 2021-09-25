@@ -25,7 +25,7 @@ public interface PersonService {
 
 	ChildAlertDTO getPeopleByAddress(String address);
 
-	List<PersonInfoDTO> getPeopleByName(String lastName);
+	List<PersonInfoDTO> getPeopleByName(String firstName, String lastName);
 
 	MappingJacksonValue getEmailByCity(String city);
 

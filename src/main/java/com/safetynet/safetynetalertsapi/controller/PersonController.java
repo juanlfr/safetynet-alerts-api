@@ -158,7 +158,7 @@ public class PersonController {
 		if (lastName != null && !lastName.isEmpty()) {
 			log.info("Finding people by first name and last name: " + firstName + lastName);
 			return new ResponseEntity<List<PersonInfoDTO>>(
-					personService.getPeopleByName(lastName), HttpStatus.OK);
+					personService.getPeopleByName(firstName, lastName), HttpStatus.OK);
 		} else {
 			log.warn("lastName is empty");
 			return new ResponseEntity<List<PersonInfoDTO>>(HttpStatus.BAD_REQUEST);

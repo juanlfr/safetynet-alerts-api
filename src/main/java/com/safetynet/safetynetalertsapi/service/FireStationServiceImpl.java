@@ -143,12 +143,13 @@ public class FireStationServiceImpl implements FireStationService {
 			FireDTO fireDTO = new FireDTO();
 			fireDTO.setFirestationNumber(firestation.getStation());
 
-			List<Person> people = getPeopleByFirestationNumber(firestation.getStation());
 			List<FireFloodDTO> peopleInFireAndFlood = new ArrayList<FireFloodDTO>();
-			FireFloodDTO fireFloodDTO = new FireFloodDTO();
+
+			List<Person> people = getPeopleByFirestationNumber(firestation.getStation());
 
 			for (Person person : people) {
-				setFireFloodDTO(fireFloodDTO, person);
+				FireFloodDTO fireFloodDTO = new FireFloodDTO();
+				personTofireFloodDTO(fireFloodDTO, person);
 				peopleInFireAndFlood.add(fireFloodDTO);
 			}
 			fireDTO.setPersonInfoInFireOrFloodDTO(peopleInFireAndFlood);
@@ -159,7 +160,7 @@ public class FireStationServiceImpl implements FireStationService {
 		}
 	}
 
-	private void setFireFloodDTO(FireFloodDTO fireFloodDTO, Person person) {
+	private void personTofireFloodDTO(FireFloodDTO fireFloodDTO, Person person) {
 
 		fireFloodDTO.setFirstName(person.getFirstName());
 		fireFloodDTO.setLastName(person.getLastName());
@@ -189,7 +190,7 @@ public class FireStationServiceImpl implements FireStationService {
 				List<Person> people = personRepository.findAllPeopleByAddress(fireStation.getAdresse());
 				for (Person person : people) {
 					FireFloodDTO fireFloodDTO = new FireFloodDTO();
-					setFireFloodDTO(fireFloodDTO, person);
+					personTofireFloodDTO(fireFloodDTO, person);
 					fireFloodDTOlist.add(fireFloodDTO);
 				}
 				floodDTO.setPersonInfoInFireOrFloodDTO(fireFloodDTOlist);

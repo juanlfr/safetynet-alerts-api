@@ -112,26 +112,28 @@ public class PersonServiceImpl implements PersonService {
 	}
 
 	@Override
-	public List<PersonInfoDTO> getPeopleByName(String lastName) {
+	public List<PersonInfoDTO> getPeopleByName(String firstName, String lastName) {
 
 		List<Person> people = personRepository.findAllPeopleByLastName(lastName);
-		List<PersonInfoDTO> personInfoDTOList = new ArrayList<PersonInfoDTO>();
-		for (Person person : people) {
-
-			PersonInfoDTO personInfoDTO = new PersonInfoDTO();
-			personInfoDTO.setFirstName(person.getFirstName());
-			personInfoDTO.setLastName(person.getLastName());
-			MedicalRecord medicalRecordFound = medicalService.getMedicalRecordByFullName(person.getLastName(),
-					person.getFirstName());
-			personInfoDTO.setAddress(person.getAddress());
-			personInfoDTO.setEmail(person.getEmail());
-			personInfoDTO.setMedications(medicalRecordFound.getMedications());
-			personInfoDTO.setAge(SafetyAlertsNetUtil.ageCalculator(medicalRecordFound));
-			personInfoDTOList.add(personInfoDTO);
-
+		if (people != null && !people.isEmpty()) {
+			List<PersonInfoDTO> personInfoDTOList = new ArrayList<PersonInfoDTO>();
+			if (people.size() > 1) {
+				for (Person person : people) {
+					personToPersonInfoDTO(personInfoDTOList, person);
+				}
+				return personInfoDTOList;
+			} else {
+				if (people.get(0).getFirstName().equals(firstName)) {
+					personToPersonInfoDTO(personInfoDTOList, people.get(0));
+					return personInfoDTOList;
+				} else {
+					log.info("person named: " + firstName + " " + lastName + " not found");
+					return null;
+				}
+			}
+		} else {
+			return null;
 		}
-
-		return personInfoDTOList;
 	}
 
 	@Override
@@ -154,4 +156,17 @@ public class PersonServiceImpl implements PersonService {
 		return null;
 	}
 
+	private void personToPersonInfoDTO(List<PersonInfoDTO> personInfoDTOList, Person person) {
+		PersonInfoDTO personInfoDTO = new PersonInfoDTO();
+		personInfoDTO.setFirstName(person.getFirstName());
+		personInfoDTO.setLastName(person.getLastName());
+		MedicalRecord medicalRecordFound = medicalService.getMedicalRecordByFullName(person.getLastName(),
+				person.getFirstName());
+		personInfoDTO.setAddress(person.getAddress());
+		personInfoDTO.setEmail(person.getEmail());
+		personInfoDTO.setMedications(medicalRecordFound.getMedications());
+		personInfoDTO.setAllergies(medicalRecordFound.getAllergies());
+		personInfoDTO.setAge(SafetyAlertsNetUtil.ageCalculator(medicalRecordFound));
+		personInfoDTOList.add(personInfoDTO);
+	}
 }
