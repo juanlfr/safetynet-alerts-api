@@ -2,7 +2,6 @@ package com.safetynet.safetynetalertsapi.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -42,8 +41,8 @@ public class FireStationServiceImpl implements FireStationService {
 	private PersonRepository personRepository;
 
 	@Override
-	public Optional<FireStation> getFireStation(String id) {
-		return fireStationRepository.findById(id);
+	public FireStation getFireStation(String address) {
+		return fireStationRepository.findFireStationByAdresse(address);
 	}
 
 	@Override
@@ -57,8 +56,8 @@ public class FireStationServiceImpl implements FireStationService {
 	}
 
 	@Override
-	public void deleteFireStation(String id) {
-		fireStationRepository.deleteById(id);
+	public void deleteFireStation(String address) {
+		fireStationRepository.deleteByAdresse(address);
 
 	}
 

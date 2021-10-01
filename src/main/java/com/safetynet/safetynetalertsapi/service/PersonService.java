@@ -1,7 +1,6 @@
 package com.safetynet.safetynetalertsapi.service;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.stereotype.Service;
@@ -13,13 +12,13 @@ import com.safetynet.safetynetalertsapi.model.DTO.PersonInfoDTO;
 @Service
 public interface PersonService {
 
-	Optional<Person> getPerson(final String id);
+	Person getPerson(final String fullName);
 
 	List<Person> getPeople();
 
 	Person savePerson(Person person);
 
-	void deletePerson(final String id);
+	void deletePerson(final String fullName);
 
 	List<Person> getPeopleByAddress(List<String> adresses);
 

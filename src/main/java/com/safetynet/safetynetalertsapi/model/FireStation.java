@@ -1,6 +1,5 @@
 package com.safetynet.safetynetalertsapi.model;
 
-import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -9,8 +8,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @Document(collection = "firestation")
 public class FireStation {
 
-	@Id
-	private String id;
 	@JsonProperty("address")
 	@Field("address")
 	private String adresse;
@@ -23,10 +20,6 @@ public class FireStation {
 	public FireStation(String adresse, String station) {
 		this.adresse = adresse;
 		this.stationNumber = station;
-	}
-
-	public String getId() {
-		return id;
 	}
 
 	public String getAdresse() {
@@ -47,7 +40,7 @@ public class FireStation {
 
 	@Override
 	public String toString() {
-		return "FireStation [id=" + id + ", adresse=" + adresse + ", station=" + stationNumber + "]";
+		return "FireStation [adresse=" + adresse + ", station=" + stationNumber + "]";
 	}
 
 }

@@ -18,4 +18,8 @@ public interface PersonRepository extends MongoRepository<Person, String> {
 
 	List<Person> findAllPeopleByCity(String city);
 
+	Person findByFirstNameAndLastName(String firstName, String lastName);
+
+	void deleteByFirstNameAndLastName(String firstName, String lastName);
+
 }

@@ -14,4 +14,6 @@ public interface FireStationRepository extends MongoRepository<FireStation, Stri
 
 	List<FireStation> findAllFireStationsByStationNumberIn(List<String> stationNumbers);
 
+	void deleteByAdresse(String address);
+
 }

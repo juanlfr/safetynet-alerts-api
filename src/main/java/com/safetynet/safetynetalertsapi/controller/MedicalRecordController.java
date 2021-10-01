@@ -1,10 +1,7 @@
 package com.safetynet.safetynetalertsapi.controller;
 
 import java.net.URI;
-import java.util.List;
 import java.util.NoSuchElementException;
-
-import javax.websocket.server.PathParam;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -35,26 +32,6 @@ public class MedicalRecordController {
 	private Logger log = LogManager.getLogger(MedicalRecordController.class);
 
 	/**
-	 * Read - Get all medical records
-	 * 
-	 * @return - A List object of medical records full filled
-	 */
-	@GetMapping("/medicalRecords")
-	public ResponseEntity<List<MedicalRecord>> getMedicalRecords() {
-
-		log.info("Retriving all medical records");
-
-		List<MedicalRecord> medicalrecords = medicalRecordService.getMedicalRecords();
-
-		if (!medicalrecords.isEmpty()) {
-			return new ResponseEntity<>(medicalrecords, HttpStatus.OK);
-		} else {
-			log.error("The list is empty");
-			return new ResponseEntity<List<MedicalRecord>>(HttpStatus.NOT_FOUND);
-		}
-	}
-
-	/**
 	 * Get a medical record
 	 * 
 	 * @param id
@@ -62,22 +39,23 @@ public class MedicalRecordController {
 	 */
 
 	@GetMapping("/{id}")
-	public MedicalRecord getMedicalRecord(@PathVariable("id") final String id) {
+	public MedicalRecord getMedicalRecord(@PathVariable("fullName") final String fullName) {
 
 		try {
-			log.info("Getting medical Record information with id: " + id);
-			return medicalRecordService.getMedicalRecord(id).get();
+			log.info("Getting medical Record information with fullName: " + fullName);
+			return medicalRecordService.getMedicalRecord(fullName);
 
 		} catch (NoSuchElementException e) {
-			log.error("medical Record with id: " + id + " not found " + e);
+			log.error("medical Record with id: " + fullName + " not found " + e);
 		}
 		return null;
 
 	}
 
 	@PostMapping
-	public ResponseEntity<Void> createfireStation(@RequestBody MedicalRecord medicalRecord) {
-		log.info("Creating fireStation with id: " + medicalRecord.toString());
+	public ResponseEntity<Void> createMedicalRecord(@RequestBody MedicalRecord medicalRecord) {
+
+		log.info("Creating MedicalRecord with id: " + medicalRecord.toString());
 		try {
 			MedicalRecord medicalRecordAdded = medicalRecordService.saveMedicalRecord(medicalRecord);
 			URI location = ServletUriComponentsBuilder.fromCurrentRequest()
@@ -101,17 +79,17 @@ public class MedicalRecordController {
 	 * @return the fire station updated
 	 * @throws NoSuchElementException
 	 */
-	@PutMapping("/{id}")
-	public ResponseEntity<MedicalRecord> updateMedicalRecord(@PathVariable("id") final String id,
+	@PutMapping("/{fullName}")
+	public ResponseEntity<MedicalRecord> updateMedicalRecord(@PathVariable("fullName") final String fullName,
 			@RequestBody MedicalRecord medicalRecord)
 			throws NoSuchElementException {
 
-		if (StringUtils.isEmpty(id)) {
+		if (StringUtils.isEmpty(fullName)) {
 			log.error("Id number is absent for the update");
 			return new ResponseEntity<MedicalRecord>(HttpStatus.BAD_REQUEST);
 		}
 
-		MedicalRecord medicalRecordUpdated = this.getMedicalRecord(id);
+		MedicalRecord medicalRecordUpdated = this.getMedicalRecord(fullName);
 
 		if (medicalRecord.getBirthdate() != null)
 			medicalRecordUpdated.setBirthdate(medicalRecord.getBirthdate());
@@ -132,27 +110,11 @@ public class MedicalRecordController {
 	 * 
 	 * @param id - The id of the medical Record to delete
 	 */
-	@DeleteMapping("/{id}")
-	public ResponseEntity<Void> deletePerson(@PathVariable("id") final String id) {
-		log.info("Deleting medical Record with id: " + id);
-		medicalRecordService.deleteMedicalRecord(id);
+	@DeleteMapping("/{fullName}")
+	public ResponseEntity<Void> deleteMedicalRecord(@PathVariable("fullName") final String fullName) {
+		log.info("Deleting medical Record with fullName: " + fullName);
+		medicalRecordService.deleteMedicalRecord(fullName);
 		return ResponseEntity.ok().build();
-	}
-
-	@GetMapping
-	public ResponseEntity<MedicalRecord> getPeopleCoveredByStationNumber(@PathParam("lastName") String lastName,
-			@PathParam("firstName") String firstName) {
-
-		log.info("Retriving some medical records");
-
-		MedicalRecord medicalrecords = medicalRecordService.getMedicalRecordByFullName(lastName, firstName);
-
-		if (medicalrecords != null) {
-			return new ResponseEntity<>(medicalrecords, HttpStatus.OK);
-		} else {
-			log.error("The list is empty");
-			return new ResponseEntity<MedicalRecord>(HttpStatus.NOT_FOUND);
-		}
 	}
 
 }

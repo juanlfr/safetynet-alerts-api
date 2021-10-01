@@ -1,7 +1,6 @@
 package com.safetynet.safetynetalertsapi.service;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.stereotype.Service;
@@ -15,13 +14,13 @@ import com.safetynet.safetynetalertsapi.model.DTO.StationNumberDTO;
 @Service
 public interface FireStationService {
 
-	Optional<FireStation> getFireStation(final String id);
+	FireStation getFireStation(final String address);
 
 	List<FireStation> getFireStations();
 
 	FireStation saveFireStation(FireStation fireStation);
 
-	void deleteFireStation(final String id);
+	void deleteFireStation(final String address);
 
 	StationNumberDTO getPeopleCoveredByStationNumber(String stationNumber);
 

@@ -39,32 +39,15 @@ public class FireStationController {
 
 	private Logger log = LogManager.getLogger(FireStationController.class);
 
-	/**
-	 * Read - Get all firestations
-	 * 
-	 * @return - A List object of firestations full filled
-	 */
-	@GetMapping("/firestations")
-	public ResponseEntity<List<FireStation>> getFireStations() {
-		log.info("Retriving all fire stations");
-		List<FireStation> firestations = fireStationService.getFireStations();
-		if (!firestations.isEmpty()) {
-			return new ResponseEntity<>(firestations, HttpStatus.OK);
-		} else {
-			log.error("The list is empty");
-			return new ResponseEntity<List<FireStation>>(HttpStatus.NOT_FOUND);
-		}
-	}
-
-	@GetMapping("/{id}")
-	public FireStation getFireStation(@PathVariable("id") final String id) {
+	@GetMapping("/{address}")
+	public FireStation getFireStation(@PathVariable("address") final String address) {
 
 		try {
-			log.info("Getting fireStation information with id: " + id);
-			return fireStationService.getFireStation(id).get();
+			log.info("Getting fireStation information with address: " + address);
+			return fireStationService.getFireStation(address);
 
 		} catch (NoSuchElementException e) {
-			log.error("fireStation with id: " + id + " not found " + e);
+			log.error("fireStation with id: " + address + " not found " + e);
 		}
 		return null;
 
@@ -82,13 +65,13 @@ public class FireStationController {
 		try {
 			FireStation fireStationAdded = fireStationService.saveFireStation(fireStation);
 			URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-					.path("/{id}")
-					.buildAndExpand(fireStationAdded.getId())
+					.path("/{address}")
+					.buildAndExpand(fireStationAdded.getAdresse().replace(" ", ""))
 					.toUri();
 			return ResponseEntity.created(location).build();
 
 		} catch (Exception e) {
-			log.error("Error on firestation record creation");
+			log.error("Error on firestation record creation" + e);
 			return new ResponseEntity<Void>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -101,20 +84,26 @@ public class FireStationController {
 	 * @return the fire station updated
 	 * @throws NoSuchElementException
 	 */
-	@PutMapping("/{id}")
-	public ResponseEntity<FireStation> updateFireStation(@PathVariable("id") final String id,
+	@PutMapping("/{address}")
+	public ResponseEntity<FireStation> updateFireStation(@PathVariable("address") final String address,
 			@RequestBody FireStation fireStation)
 			throws NoSuchElementException {
 
-		FireStation fireStationUpdated = this.getFireStation(id);
+		if (address != null && !address.isEmpty()) {
 
-		if (fireStation.getStation() != null)
-			fireStationUpdated.setStation(fireStation.getStation());
+			FireStation fireStationUpdated = this.getFireStation(address);
 
-		log.info("Updating fireStation information " + fireStationUpdated.toString());
+			if (fireStation.getStation() != null)
+				fireStationUpdated.setStation(fireStation.getStation());
 
-		return new ResponseEntity<FireStation>(fireStationService.saveFireStation(fireStationUpdated),
-				HttpStatus.OK);
+			log.info("Updating fireStation information " + fireStationUpdated.toString());
+
+			return new ResponseEntity<FireStation>(fireStationService.saveFireStation(fireStationUpdated),
+					HttpStatus.OK);
+		} else {
+			log.error("address is null or empty");
+			return new ResponseEntity<FireStation>(HttpStatus.BAD_REQUEST);
+		}
 
 	}
 
@@ -123,11 +112,16 @@ public class FireStationController {
 	 * 
 	 * @param id - The id of the fire station to delete
 	 */
-	@DeleteMapping("/{id}")
-	public ResponseEntity<Void> deleteFireStation(@PathVariable("id") final String id) {
-		log.info("Deleting fire station with id: " + id);
-		fireStationService.deleteFireStation(id);
-		return ResponseEntity.ok().build();
+	@DeleteMapping("/{address}")
+	public ResponseEntity<Void> deleteFireStation(@PathVariable("address") final String address) {
+		if (address != null && !address.isEmpty()) {
+			log.info("Deleting fire station with address: " + address);
+			fireStationService.deleteFireStation(address);
+			return ResponseEntity.ok().build();
+		} else {
+			log.error("address is null or empty");
+			return new ResponseEntity<Void>(HttpStatus.BAD_REQUEST);
+		}
 	}
 
 	@GetMapping

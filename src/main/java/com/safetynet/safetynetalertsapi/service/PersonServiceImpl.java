@@ -2,7 +2,6 @@ package com.safetynet.safetynetalertsapi.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -33,8 +32,11 @@ public class PersonServiceImpl implements PersonService {
 	private MedicalRecordService medicalService;
 
 	@Override
-	public Optional<Person> getPerson(String id) {
-		return personRepository.findById(id);
+	public Person getPerson(String fullName) {
+		String[] name = fullName.trim().split("\\s+");
+		System.out.println(name[0] + name[1]);
+		return personRepository.findByFirstNameAndLastName(name[0], name[1]);
+
 	}
 
 	@Override
@@ -49,8 +51,10 @@ public class PersonServiceImpl implements PersonService {
 	}
 
 	@Override
-	public void deletePerson(String id) {
-		personRepository.deleteById(id);
+	public void deletePerson(String fullName) {
+		String[] name = fullName.trim().split("\\s+");
+		System.out.println(name[0] + name[1]);
+		personRepository.deleteByFirstNameAndLastName(name[0], name[1]);
 	}
 
 	@Override
@@ -175,4 +179,5 @@ public class PersonServiceImpl implements PersonService {
 		personRepository.saveAll(people);
 
 	}
+
 }

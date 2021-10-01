@@ -1,7 +1,6 @@
 package com.safetynet.safetynetalertsapi.service;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -10,7 +9,7 @@ import com.safetynet.safetynetalertsapi.model.MedicalRecord;
 @Service
 public interface MedicalRecordService {
 
-	Optional<MedicalRecord> getMedicalRecord(final String id);
+	MedicalRecord getMedicalRecord(final String fullName);
 
 	List<MedicalRecord> getMedicalRecords();
 

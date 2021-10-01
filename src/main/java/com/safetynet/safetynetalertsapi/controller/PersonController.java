@@ -22,12 +22,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.fasterxml.jackson.databind.ser.FilterProvider;
-import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import com.safetynet.safetynetalertsapi.model.Person;
 import com.safetynet.safetynetalertsapi.model.DTO.ChildAlertDTO;
 import com.safetynet.safetynetalertsapi.model.DTO.PersonInfoDTO;
 import com.safetynet.safetynetalertsapi.service.PersonService;
+import com.safetynet.safetynetalertsapi.utils.SafetyAlertsNetUtil;
 
 @RestController
 @RequestMapping("/person")
@@ -39,39 +38,20 @@ public class PersonController {
 	private Logger log = LogManager.getLogger(PersonController.class);
 
 	/**
-	 * Read - Get all people
-	 * 
-	 * @return - A List object of people full filled
-	 */
-	@GetMapping("/people")
-	public ResponseEntity<MappingJacksonValue> getPeople() {
-		log.info("*************" + "call to Person controller: method getPeople" + "****************");
-
-		List<Person> people = personService.getPeople();
-		if (people != null && !people.isEmpty()) {
-			MappingJacksonValue responseDTO = setFiltersToFalse(people);
-			return new ResponseEntity<MappingJacksonValue>(responseDTO, HttpStatus.OK);
-		} else {
-			log.warn("No people founded");
-			return null;
-		}
-	}
-
-	/**
 	 * Read - Get one employee
 	 * 
 	 * @param id The id of the employee
 	 * @return An person object full filled
 	 */
-	@GetMapping("/{id}")
-	public Person getPerson(@PathVariable("id") final String id) {
+	@GetMapping("/{fullName}")
+	public Person getPerson(@PathVariable("fullName") final String fullName) {
 
 		try {
-			log.info("Getting person information with id: " + id);
-			return personService.getPerson(id).get();
+			log.info("Getting person information with name : " + fullName);
+			return personService.getPerson(fullName);
 
 		} catch (NoSuchElementException e) {
-			log.error("Person with id: " + id + " not found " + e);
+			log.error("Person with id: " + fullName + " not found " + e);
 		}
 		return null;
 
@@ -94,11 +74,12 @@ public class PersonController {
 		}
 	}
 
-	@PutMapping("/{id}")
-	public ResponseEntity<Person> updatePerson(@PathVariable("id") final String id, @RequestBody Person person)
+	@PutMapping("/{fullName}")
+	public ResponseEntity<MappingJacksonValue> updatePerson(@PathVariable("fullName") final String fullName,
+			@RequestBody Person person)
 			throws NoSuchElementException {
 
-		Person personUpdated = this.getPerson(id);
+		Person personUpdated = this.getPerson(fullName);
 
 		if (person.getAddress() != null)
 			personUpdated.setAddress(person.getAddress());
@@ -112,22 +93,27 @@ public class PersonController {
 			personUpdated.setPhone(person.getPhone());
 
 		log.info("Updating person information" + personUpdated.toString());
+		Person personToUpdate = personService.savePerson(personUpdated);
+		MappingJacksonValue responsePerson = SafetyAlertsNetUtil.setFiltersToFalse(personToUpdate);
 
-		return new ResponseEntity<Person>(personService.savePerson(personUpdated),
-				HttpStatus.OK);
+		return new ResponseEntity<MappingJacksonValue>(responsePerson, HttpStatus.OK);
 
 	}
 
 	/**
 	 * Delete - Delete a person
 	 * 
-	 * @param id - The id of the employee to delete
+	 * @param fullname - The fullname to delete
 	 */
-	@DeleteMapping("/{id}")
-	public ResponseEntity<Void> deletePerson(@PathVariable("id") final String id) {
-		log.info("Deleting person with id: " + id);
-		personService.deletePerson(id);
-		return ResponseEntity.ok().build();
+	@DeleteMapping("/{fullName}")
+	public ResponseEntity<Void> deletePerson(@PathVariable("fullName") final String fullName) {
+		if (fullName != null && !fullName.isEmpty()) {
+			log.info("Deleting person with name: " + fullName);
+			personService.deletePerson(fullName);
+			return ResponseEntity.ok().build();
+		} else {
+			return ResponseEntity.badRequest().build();
+		}
 	}
 
 	@GetMapping("/childAlert")
@@ -137,7 +123,7 @@ public class PersonController {
 
 			ChildAlertDTO childAlertDTO = personService.getPeopleByAddress(address);
 			if (childAlertDTO != null) {
-				MappingJacksonValue responseDTO = setFiltersToFalse(childAlertDTO);
+				MappingJacksonValue responseDTO = SafetyAlertsNetUtil.setFiltersToFalse(childAlertDTO);
 				return new ResponseEntity<MappingJacksonValue>(responseDTO, HttpStatus.OK);
 			} else {
 				log.warn("No childs founded");
@@ -178,10 +164,4 @@ public class PersonController {
 
 	}
 
-	private MappingJacksonValue setFiltersToFalse(Object o) {
-		FilterProvider filters = new SimpleFilterProvider().setFailOnUnknownId(false);
-		MappingJacksonValue responseDTO = new MappingJacksonValue(o);
-		responseDTO.setFilters(filters);
-		return responseDTO;
-	}
 }

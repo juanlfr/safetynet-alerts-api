@@ -106,4 +106,8 @@ public class Person {
 				+ ", city=" + city + ", zip=" + zip + ", phone=" + phone + ", email=" + email + "]";
 	}
 
+	public void setId(String id) {
+		this.id = id;
+	}
+
 }

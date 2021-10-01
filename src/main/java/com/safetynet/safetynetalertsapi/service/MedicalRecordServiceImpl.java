@@ -1,7 +1,6 @@
 package com.safetynet.safetynetalertsapi.service;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,8 +15,10 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 	private MedicalRecordRepository medicalRecordRepository;
 
 	@Override
-	public Optional<MedicalRecord> getMedicalRecord(String id) {
-		return medicalRecordRepository.findById(id);
+	public MedicalRecord getMedicalRecord(String fullName) {
+		String[] name = fullName.trim().split("\\s+");
+		System.out.println(name[0] + name[1]);
+		return medicalRecordRepository.findByLastNameAndFirstName(name[0], name[1]);
 	}
 
 	@Override
