@@ -8,20 +8,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-//@ActiveProfiles("test")
-@ExtendWith(SpringExtension.class)
-@AutoConfigureMockMvc
+@ActiveProfiles("test")
 @SpringBootTest
-@TestPropertySource(locations = "classpath:application-integrationtest.properties")
-public class SafetyNetAlertIT {
+@AutoConfigureMockMvc
+
+public class SafetyNetAlertIntegrationTest {
 
 	@Autowired
 	private MockMvc mockMvc;
@@ -70,17 +67,27 @@ public class SafetyNetAlertIT {
 
 		this.mockMvc.perform(get("/person/communityEmail?city=Culver"))
 				.andDo(print())
-				.andExpect(jsonPath("$", Matchers.hasSize(23)))
+				.andExpect(jsonPath("$").isArray())
 				.andExpect(status().isOk());
 	}
 
 	@Test
-	public void fooldAlertTest() throws Exception {
+	public void floodAlertTest() throws Exception {
 
 		this.mockMvc.perform(get("/firestation/flood/stations?stations=1"))
 				.andDo(print())
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$").isArray())
 				.andExpect(jsonPath("$[0].personInfoInFireOrFloodDTO", Matchers.hasSize(1)));
+	}
+
+	@Test
+	public void phoneAlertTest() throws Exception {
+
+		this.mockMvc.perform(get("/firestation/phoneAlert?firestationNumber=1"))
+				.andDo(print())
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$").isArray())
+				.andExpect(jsonPath("$[0].phone", is("841-874-6512")));
 	}
 }

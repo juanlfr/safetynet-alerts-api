@@ -14,8 +14,6 @@ public interface PersonService {
 
 	Person getPerson(final String fullName);
 
-	List<Person> getPeople();
-
 	Person savePerson(Person person);
 
 	void deletePerson(final String fullName);
@@ -29,5 +27,7 @@ public interface PersonService {
 	MappingJacksonValue getEmailByCity(String city);
 
 	void saveAll(List<Person> people);
+
+	List<Person> findAll();
 
 }

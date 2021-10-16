@@ -4,6 +4,9 @@ import java.net.URI;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import javax.websocket.server.PathParam;
 
 import org.apache.logging.log4j.LogManager;
@@ -12,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.MappingJacksonValue;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,6 +36,7 @@ import com.safetynet.safetynetalertsapi.service.FireStationService;
 
 @RestController
 @RequestMapping("/firestation")
+@Validated
 public class FireStationController {
 
 	@Autowired
@@ -60,20 +65,15 @@ public class FireStationController {
 	 * @return
 	 */
 	@PostMapping
-	public ResponseEntity<Void> createfireStation(@RequestBody FireStation fireStation) {
-		log.info("Creating fireStation with id: " + fireStation.toString());
-		try {
-			FireStation fireStationAdded = fireStationService.saveFireStation(fireStation);
-			URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-					.path("/{address}")
-					.buildAndExpand(fireStationAdded.getAdresse().replace(" ", ""))
-					.toUri();
-			return ResponseEntity.created(location).build();
+	public ResponseEntity<Void> createfireStation(@RequestBody @NotNull FireStation fireStation) {
 
-		} catch (Exception e) {
-			log.error("Error on firestation record creation" + e);
-			return new ResponseEntity<Void>(HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		FireStation fireStationAdded = fireStationService.saveFireStation(fireStation);
+		URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+				.path("/{address}")
+				.buildAndExpand(fireStationAdded.getAdresse().replace(" ", ""))
+				.toUri();
+		return ResponseEntity.created(location).build();
+
 	}
 
 	/**
@@ -85,26 +85,22 @@ public class FireStationController {
 	 * @throws NoSuchElementException
 	 */
 	@PutMapping("/{address}")
-	public ResponseEntity<FireStation> updateFireStation(@PathVariable("address") final String address,
-			@RequestBody FireStation fireStation)
-			throws NoSuchElementException {
+	public ResponseEntity<FireStation> updateFireStation(@PathVariable("address") @NotBlank final String address,
+			@RequestBody @NotNull FireStation fireStation) {
 
-		if (address != null && !address.isEmpty()) {
+		FireStation fireStationUpdated = this.getFireStation(address);
 
-			FireStation fireStationUpdated = this.getFireStation(address);
-
-			if (fireStation.getStation() != null)
-				fireStationUpdated.setStation(fireStation.getStation());
+		if (fireStationUpdated != null) {
 
 			log.info("Updating fireStation information " + fireStationUpdated.toString());
+			fireStationUpdated.setStation(fireStation.getStation());
 
 			return new ResponseEntity<FireStation>(fireStationService.saveFireStation(fireStationUpdated),
 					HttpStatus.OK);
 		} else {
-			log.error("address is null or empty");
-			return new ResponseEntity<FireStation>(HttpStatus.BAD_REQUEST);
+			log.error("Firestation not founded" + fireStationUpdated);
+			throw new NoSuchElementException();
 		}
-
 	}
 
 	/**
@@ -113,7 +109,7 @@ public class FireStationController {
 	 * @param id - The id of the fire station to delete
 	 */
 	@DeleteMapping("/{address}")
-	public ResponseEntity<Void> deleteFireStation(@PathVariable("address") final String address) {
+	public ResponseEntity<Void> deleteFireStation(@PathVariable("address") @NotBlank final String address) {
 		if (address != null && !address.isEmpty()) {
 			log.info("Deleting fire station with address: " + address);
 			fireStationService.deleteFireStation(address);
@@ -126,54 +122,40 @@ public class FireStationController {
 
 	@GetMapping
 	public ResponseEntity<StationNumberDTO> getPeopleCoveredByStationNumber(
-			@PathParam("stationNumber") String stationNumber) {
-		if (stationNumber != null && !stationNumber.isEmpty()) {
-			log.info("Finding people by firestation number: " + stationNumber);
-			return new ResponseEntity<StationNumberDTO>(
-					fireStationService.getPeopleCoveredByStationNumber(stationNumber), HttpStatus.OK);
-		} else {
-			log.warn("Firestation number is empty");
-			return new ResponseEntity<StationNumberDTO>(HttpStatus.BAD_REQUEST);
-		}
+			@PathParam("stationNumber") @NotBlank String stationNumber) {
+
+		log.info("Finding people by firestation number: " + stationNumber);
+		return new ResponseEntity<StationNumberDTO>(
+				fireStationService.getPeopleCoveredByStationNumber(stationNumber), HttpStatus.OK);
+
 	}
 
 	@GetMapping("/phoneAlert")
 	public ResponseEntity<MappingJacksonValue> getPhoneNumbersByFireStationNumber(
-			@PathParam("firestationNumber") String firestationNumber) throws JsonProcessingException {
-		if (firestationNumber != null && !firestationNumber.isEmpty()) {
-			log.info("Finding Phone Number by firestation number: " + firestationNumber);
-			return new ResponseEntity<MappingJacksonValue>(
-					fireStationService.getPhoneNumbersByFireStationNumber(firestationNumber), HttpStatus.OK);
-		} else {
-			log.warn("Firestation number is empty");
-			return new ResponseEntity<MappingJacksonValue>(HttpStatus.BAD_REQUEST);
-		}
+			@PathParam("firestationNumber") @NotBlank String firestationNumber) throws JsonProcessingException {
+
+		log.info("Finding Phone Number by firestation number: " + firestationNumber);
+		return new ResponseEntity<MappingJacksonValue>(
+				fireStationService.getPhoneNumbersByFireStationNumber(firestationNumber), HttpStatus.OK);
 	}
 
 	@GetMapping("/fire")
 	public ResponseEntity<FireDTO> getPeopleAndFirestationNumbersByAddress(
-			@PathParam("address") String address) {
-		if (address != null && !address.isEmpty()) {
-			log.info("Finding people by addres: " + address);
-			return new ResponseEntity<FireDTO>(
-					fireStationService.getPeopleAndFirestationNumbersByAddress(address), HttpStatus.OK);
-		} else {
-			log.warn("Firestation number is empty");
-			return new ResponseEntity<FireDTO>(HttpStatus.BAD_REQUEST);
-		}
+			@PathParam("address") @NotBlank String address) {
+
+		log.info("Finding people by addres: " + address);
+		return new ResponseEntity<FireDTO>(
+				fireStationService.getPeopleAndFirestationNumbersByAddress(address), HttpStatus.OK);
 	}
 
 	@GetMapping("/flood/stations")
 	public ResponseEntity<List<FloodDTO>> getPeopleByStationsNumbers(
-			@RequestParam("stations") List<String> stations) {
+			@RequestParam("stations") @NotEmpty List<String> stations) {
 		log.info("Finding people by the stations: " + stations);
-		if (stations != null && !stations.isEmpty()) {
-			return new ResponseEntity<List<FloodDTO>>(
-					fireStationService.getPeopleByStationsNumbers(stations), HttpStatus.OK);
-		} else {
-			log.warn("Firestation number is empty");
-			return new ResponseEntity<List<FloodDTO>>(HttpStatus.BAD_REQUEST);
-		}
+
+		return new ResponseEntity<List<FloodDTO>>(
+				fireStationService.getPeopleByStationsNumbers(stations), HttpStatus.OK);
+
 	}
 
 }

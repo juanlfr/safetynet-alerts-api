@@ -36,4 +36,9 @@ public final class SafetyAlertsNetUtil {
 		}
 	}
 
+	public static String[] splitName(String fullName) {
+		String[] name = fullName.trim().split("\\s+");
+		return name;
+	}
+
 }

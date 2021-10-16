@@ -25,6 +25,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJacksonValue;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ser.FilterProvider;
@@ -41,7 +42,7 @@ import com.safetynet.safetynetalertsapi.model.DTO.StationNumberDTO;
 import com.safetynet.safetynetalertsapi.service.FireStationService;
 import com.safetynet.safetynetalertsapi.utils.SafetyAlertsNetUtil;
 
-//@ActiveProfiles("test")
+@ActiveProfiles("test")
 @WebMvcTest(controllers = FireStationController.class)
 public class FireStationControllerTest {
 
@@ -88,6 +89,22 @@ public class FireStationControllerTest {
 				.andExpect(status().isOk());
 
 		assertThat(fireStation.getStation()).isEqualTo("1");
+	}
+
+	@Test
+	public void updateFireStationErrorTest() throws Exception {
+
+		FireStation fireStationDataToUpdate = new FireStation();
+		fireStationDataToUpdate.setStation("1");
+		fireStationDataToUpdate.setAdresse("1 test st");
+
+		when(fireStationService.getFireStation(Mockito.anyString())).thenReturn(null);
+
+		this.mockMvc.perform(put("/firestation/1 test st")
+				.content(SafetyAlertsNetUtil.toJsonString(fireStationDataToUpdate))
+				.contentType(MediaType.APPLICATION_JSON))
+				.andDo(print())
+				.andExpect(status().isNotFound());
 	}
 
 	@Test

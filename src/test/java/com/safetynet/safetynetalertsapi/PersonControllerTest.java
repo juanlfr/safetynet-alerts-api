@@ -25,6 +25,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJacksonValue;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -38,7 +39,7 @@ import com.safetynet.safetynetalertsapi.model.DTO.ChildDTO;
 import com.safetynet.safetynetalertsapi.model.DTO.PersonInfoDTO;
 import com.safetynet.safetynetalertsapi.service.PersonService;
 
-//@ActiveProfiles("test")
+@ActiveProfiles("test")
 @WebMvcTest(controllers = PersonController.class)
 public class PersonControllerTest {
 

@@ -46,11 +46,6 @@ public class FireStationServiceImpl implements FireStationService {
 	}
 
 	@Override
-	public List<FireStation> getFireStations() {
-		return fireStationRepository.findAll();
-	}
-
-	@Override
 	public FireStation saveFireStation(FireStation fireStation) {
 		return fireStationRepository.save(fireStation);
 	}
@@ -204,6 +199,12 @@ public class FireStationServiceImpl implements FireStationService {
 	@Override
 	public void saveAll(List<FireStation> fireStations) {
 		fireStationRepository.saveAll(fireStations);
+
+	}
+
+	@Override
+	public List<FireStation> findAll() {
+		return fireStationRepository.findAll();
 
 	}
 }

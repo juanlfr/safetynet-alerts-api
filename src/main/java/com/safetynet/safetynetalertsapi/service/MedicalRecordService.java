@@ -11,8 +11,6 @@ public interface MedicalRecordService {
 
 	MedicalRecord getMedicalRecord(final String fullName);
 
-	List<MedicalRecord> getMedicalRecords();
-
 	MedicalRecord saveMedicalRecord(MedicalRecord medicalRecord);
 
 	void deleteMedicalRecord(final String id);
@@ -20,5 +18,7 @@ public interface MedicalRecordService {
 	MedicalRecord getMedicalRecordByFullName(String lastName, String firstName);
 
 	void saveAll(List<MedicalRecord> medicalRecords);
+
+	List<MedicalRecord> findAll();
 
 }

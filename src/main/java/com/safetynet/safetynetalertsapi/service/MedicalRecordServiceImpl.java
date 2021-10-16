@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.safetynet.safetynetalertsapi.model.MedicalRecord;
 import com.safetynet.safetynetalertsapi.repository.MedicalRecordRepository;
+import com.safetynet.safetynetalertsapi.utils.SafetyAlertsNetUtil;
 
 @Service
 public class MedicalRecordServiceImpl implements MedicalRecordService {
@@ -16,14 +17,8 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 
 	@Override
 	public MedicalRecord getMedicalRecord(String fullName) {
-		String[] name = fullName.trim().split("\\s+");
-		System.out.println(name[0] + name[1]);
+		String[] name = SafetyAlertsNetUtil.splitName(fullName);
 		return medicalRecordRepository.findByLastNameAndFirstName(name[0], name[1]);
-	}
-
-	@Override
-	public List<MedicalRecord> getMedicalRecords() {
-		return medicalRecordRepository.findAll();
 	}
 
 	@Override
@@ -32,8 +27,9 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 	}
 
 	@Override
-	public void deleteMedicalRecord(String id) {
-		medicalRecordRepository.deleteById(id);
+	public void deleteMedicalRecord(String fullName) {
+		String[] name = SafetyAlertsNetUtil.splitName(fullName);
+		medicalRecordRepository.deleteByLastNameAndFirstName(name[1], name[0]);
 	}
 
 	@Override
@@ -46,6 +42,11 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 	@Override
 	public void saveAll(List<MedicalRecord> medicalRecords) {
 		medicalRecordRepository.saveAll(medicalRecords);
+	}
+
+	@Override
+	public List<MedicalRecord> findAll() {
+		return medicalRecordRepository.findAll();
 	}
 
 }

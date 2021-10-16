@@ -3,6 +3,8 @@ package com.safetynet.safetynetalertsapi.controller;
 import java.net.URI;
 import java.util.NoSuchElementException;
 
+import javax.validation.constraints.NotBlank;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +23,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.safetynet.safetynetalertsapi.model.MedicalRecord;
 import com.safetynet.safetynetalertsapi.service.MedicalRecordService;
 
-import io.micrometer.core.instrument.util.StringUtils;
-
 @RestController
 @RequestMapping("/medicalRecord")
 public class MedicalRecordController {
@@ -38,17 +38,11 @@ public class MedicalRecordController {
 	 * @return
 	 */
 
-	@GetMapping("/{id}")
+	@GetMapping("/{fullName}")
 	public MedicalRecord getMedicalRecord(@PathVariable("fullName") final String fullName) {
 
-		try {
-			log.info("Getting medical Record information with fullName: " + fullName);
-			return medicalRecordService.getMedicalRecord(fullName);
-
-		} catch (NoSuchElementException e) {
-			log.error("medical Record with id: " + fullName + " not found " + e);
-		}
-		return null;
+		log.info("Getting medical Record information with fullName: " + fullName);
+		return medicalRecordService.getMedicalRecord(fullName);
 
 	}
 
@@ -80,14 +74,9 @@ public class MedicalRecordController {
 	 * @throws NoSuchElementException
 	 */
 	@PutMapping("/{fullName}")
-	public ResponseEntity<MedicalRecord> updateMedicalRecord(@PathVariable("fullName") final String fullName,
+	public ResponseEntity<MedicalRecord> updateMedicalRecord(@PathVariable("fullName") final @NotBlank String fullName,
 			@RequestBody MedicalRecord medicalRecord)
 			throws NoSuchElementException {
-
-		if (StringUtils.isEmpty(fullName)) {
-			log.error("Id number is absent for the update");
-			return new ResponseEntity<MedicalRecord>(HttpStatus.BAD_REQUEST);
-		}
 
 		MedicalRecord medicalRecordUpdated = this.getMedicalRecord(fullName);
 

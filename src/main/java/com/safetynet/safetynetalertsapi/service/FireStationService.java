@@ -16,8 +16,6 @@ public interface FireStationService {
 
 	FireStation getFireStation(final String address);
 
-	List<FireStation> getFireStations();
-
 	FireStation saveFireStation(FireStation fireStation);
 
 	void deleteFireStation(final String address);
@@ -31,4 +29,6 @@ public interface FireStationService {
 	List<FloodDTO> getPeopleByStationsNumbers(List<String> stations);
 
 	void saveAll(List<FireStation> fireStations);
+
+	List<FireStation> findAll();
 }

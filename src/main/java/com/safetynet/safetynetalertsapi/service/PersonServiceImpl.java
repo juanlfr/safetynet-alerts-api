@@ -33,15 +33,9 @@ public class PersonServiceImpl implements PersonService {
 
 	@Override
 	public Person getPerson(String fullName) {
-		String[] name = fullName.trim().split("\\s+");
-		System.out.println(name[0] + name[1]);
+		String[] name = SafetyAlertsNetUtil.splitName(fullName);
 		return personRepository.findByFirstNameAndLastName(name[0], name[1]);
 
-	}
-
-	@Override
-	public List<Person> getPeople() {
-		return personRepository.findAll();
 	}
 
 	@Override
@@ -52,8 +46,7 @@ public class PersonServiceImpl implements PersonService {
 
 	@Override
 	public void deletePerson(String fullName) {
-		String[] name = fullName.trim().split("\\s+");
-		System.out.println(name[0] + name[1]);
+		String[] name = SafetyAlertsNetUtil.splitName(fullName);
 		personRepository.deleteByFirstNameAndLastName(name[0], name[1]);
 	}
 
@@ -177,6 +170,12 @@ public class PersonServiceImpl implements PersonService {
 	@Override
 	public void saveAll(List<Person> people) {
 		personRepository.saveAll(people);
+
+	}
+
+	@Override
+	public List<Person> findAll() {
+		return personRepository.findAll();
 
 	}
 

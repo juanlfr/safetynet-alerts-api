@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import javax.validation.constraints.NotBlank;
 import javax.websocket.server.PathParam;
 
 import org.apache.logging.log4j.LogManager;
@@ -44,17 +45,10 @@ public class PersonController {
 	 * @return An person object full filled
 	 */
 	@GetMapping("/{fullName}")
-	public Person getPerson(@PathVariable("fullName") final String fullName) {
+	public Person getPerson(@PathVariable("fullName") final @NotBlank String fullName) {
 
-		try {
-			log.info("Getting person information with name : " + fullName);
-			return personService.getPerson(fullName);
-
-		} catch (NoSuchElementException e) {
-			log.error("Person with id: " + fullName + " not found " + e);
-		}
-		return null;
-
+		log.info("Getting person information with name : " + fullName);
+		return personService.getPerson(fullName);
 	}
 
 	@PostMapping
@@ -106,61 +100,45 @@ public class PersonController {
 	 * @param fullname - The fullname to delete
 	 */
 	@DeleteMapping("/{fullName}")
-	public ResponseEntity<Void> deletePerson(@PathVariable("fullName") final String fullName) {
-		if (fullName != null && !fullName.isEmpty()) {
-			log.info("Deleting person with name: " + fullName);
-			personService.deletePerson(fullName);
-			return ResponseEntity.ok().build();
-		} else {
-			return ResponseEntity.badRequest().build();
-		}
+	public ResponseEntity<Void> deletePerson(@PathVariable("fullName") @NotBlank final String fullName) {
+
+		log.info("Deleting person with name: " + fullName);
+		personService.deletePerson(fullName);
+		return ResponseEntity.ok().build();
 	}
 
 	@GetMapping("/childAlert")
-	public ResponseEntity<MappingJacksonValue> getChildsByAddress(@PathParam("address") String address) {
-		if (address != null && !address.isEmpty()) {
-			log.info("Finding childs by address: " + address);
+	public ResponseEntity<MappingJacksonValue> getChildsByAddress(@PathParam("address") @NotBlank String address) {
 
-			ChildAlertDTO childAlertDTO = personService.getPeopleByAddress(address);
-			if (childAlertDTO != null) {
-				MappingJacksonValue responseDTO = SafetyAlertsNetUtil.setFiltersToFalse(childAlertDTO);
-				return new ResponseEntity<MappingJacksonValue>(responseDTO, HttpStatus.OK);
-			} else {
-				log.warn("No childs founded");
-				return null;
-			}
+		log.info("Finding childs by address: " + address);
+
+		ChildAlertDTO childAlertDTO = personService.getPeopleByAddress(address);
+		if (childAlertDTO != null) {
+			MappingJacksonValue responseDTO = SafetyAlertsNetUtil.setFiltersToFalse(childAlertDTO);
+			return new ResponseEntity<MappingJacksonValue>(responseDTO, HttpStatus.OK);
 		} else {
-			log.warn("Address is empty");
-			return new ResponseEntity<MappingJacksonValue>(HttpStatus.BAD_REQUEST);
+			log.warn("No childs founded");
+			return null;
 		}
 
 	}
 
 	@GetMapping("/personInfo")
 	public ResponseEntity<List<PersonInfoDTO>> getPeopleByName(@PathParam("firstName") String firstName,
-			@PathParam("lastName") String lastName) {
-		if (lastName != null && !lastName.isEmpty()) {
-			log.info("Finding people by first name and last name: " + firstName + lastName);
-			return new ResponseEntity<List<PersonInfoDTO>>(
-					personService.getPeopleByName(firstName, lastName), HttpStatus.OK);
-		} else {
-			log.warn("lastName is empty");
-			return new ResponseEntity<List<PersonInfoDTO>>(HttpStatus.BAD_REQUEST);
-		}
+			@PathParam("lastName") @NotBlank String lastName) {
+
+		log.info("Finding people by first name and last name: " + firstName + lastName);
+		return new ResponseEntity<List<PersonInfoDTO>>(
+				personService.getPeopleByName(firstName, lastName), HttpStatus.OK);
 
 	}
 
 	@GetMapping("/communityEmail")
-	public ResponseEntity<MappingJacksonValue> getEmailByCity(@PathParam("city") String city) {
+	public ResponseEntity<MappingJacksonValue> getEmailByCity(@PathParam("city") @NotBlank String city) {
 
-		if (city != null && !city.isEmpty()) {
-			log.info("Finding email by city: " + city);
-			return new ResponseEntity<MappingJacksonValue>(
-					personService.getEmailByCity(city), HttpStatus.OK);
-		} else {
-			log.warn("city is empty");
-			return new ResponseEntity<MappingJacksonValue>(HttpStatus.BAD_REQUEST);
-		}
+		log.info("Finding email by city: " + city);
+		return new ResponseEntity<MappingJacksonValue>(
+				personService.getEmailByCity(city), HttpStatus.OK);
 
 	}
 

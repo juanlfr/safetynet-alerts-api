@@ -8,4 +8,6 @@ public interface MedicalRecordRepository extends MongoRepository<MedicalRecord, 
 
 	MedicalRecord findByLastNameAndFirstName(String lastName, String firstName);
 
+	void deleteByLastNameAndFirstName(String string, String string2);
+
 }
