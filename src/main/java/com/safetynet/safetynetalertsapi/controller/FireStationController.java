@@ -110,14 +110,10 @@ public class FireStationController {
 	 */
 	@DeleteMapping("/{address}")
 	public ResponseEntity<Void> deleteFireStation(@PathVariable("address") @NotBlank final String address) {
-		if (address != null && !address.isEmpty()) {
-			log.info("Deleting fire station with address: " + address);
-			fireStationService.deleteFireStation(address);
-			return ResponseEntity.ok().build();
-		} else {
-			log.error("address is null or empty");
-			return new ResponseEntity<Void>(HttpStatus.BAD_REQUEST);
-		}
+		log.info("Deleting fire station with address: " + address);
+		fireStationService.deleteFireStation(address);
+		return ResponseEntity.ok().build();
+
 	}
 
 	@GetMapping
