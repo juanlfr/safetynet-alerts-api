@@ -42,7 +42,10 @@ public class MedicalRecordController {
 	public MedicalRecord getMedicalRecord(@PathVariable("fullName") final String fullName) {
 
 		log.info("Getting medical Record information with fullName: " + fullName);
-		return medicalRecordService.getMedicalRecord(fullName);
+		MedicalRecord medicalrecord = medicalRecordService.getMedicalRecord(fullName);
+		if (medicalrecord == null)
+			throw new NoSuchElementException();
+		return medicalrecord;
 
 	}
 

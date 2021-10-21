@@ -50,17 +50,12 @@ public class FireStationController {
 	 * @param address
 	 * @return
 	 */
+
 	@GetMapping("/{address}")
 	public FireStation getFireStation(@PathVariable("address") final String address) {
 
-		try {
-			log.info("Getting fireStation information with address: " + address);
-			return fireStationService.getFireStation(address);
-
-		} catch (NoSuchElementException e) {
-			log.error("fireStation with id: " + address + " not found " + e);
-		}
-		return null;
+		log.info("Getting fireStation information with address: " + address);
+		return fireStationService.getFireStation(address);
 
 	}
 
@@ -73,6 +68,7 @@ public class FireStationController {
 	@PostMapping
 	public ResponseEntity<Void> createfireStation(@RequestBody @NotNull FireStation fireStation) {
 
+		log.info("Creating firestation" + fireStation.toString());
 		FireStation fireStationAdded = fireStationService.saveFireStation(fireStation);
 		URI location = ServletUriComponentsBuilder.fromCurrentRequest()
 				.path("/{address}")

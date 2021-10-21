@@ -7,7 +7,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.fasterxml.jackson.annotation.JsonFilter;
 
-@JsonFilter("FiltreDynamique")
 @Document
 public class Person {
 
@@ -20,7 +19,9 @@ public class Person {
 	private String address;
 	private String city;
 	private String zip;
+	@JsonFilter("FiltreDynamique")
 	private String phone;
+	@JsonFilter("FiltreDynamique")
 	private String email;
 
 	public Person() {

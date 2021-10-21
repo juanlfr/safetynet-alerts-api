@@ -18,7 +18,7 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 	@Override
 	public MedicalRecord getMedicalRecord(String fullName) {
 		String[] name = SafetyAlertsNetUtil.splitName(fullName);
-		return medicalRecordRepository.findByLastNameAndFirstName(name[0], name[1]);
+		return medicalRecordRepository.findByLastNameAndFirstName(name[1], name[0]);
 	}
 
 	@Override

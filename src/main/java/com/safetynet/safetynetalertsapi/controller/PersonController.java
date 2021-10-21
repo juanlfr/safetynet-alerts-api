@@ -49,6 +49,7 @@ public class PersonController {
 
 		log.info("Getting person information with name : " + fullName);
 		return personService.getPerson(fullName);
+
 	}
 
 	/**
@@ -87,23 +88,26 @@ public class PersonController {
 
 		Person personUpdated = this.getPerson(fullName);
 
-		if (person.getAddress() != null)
-			personUpdated.setAddress(person.getAddress());
-		if (person.getCity() != null)
-			personUpdated.setCity(person.getCity());
-		if (person.getZip() != null)
-			personUpdated.setZip(person.getZip());
-		if (person.getEmail() != null)
-			personUpdated.setEmail(person.getEmail());
-		if (person.getPhone() != null)
-			personUpdated.setPhone(person.getPhone());
+		if (personUpdated != null) {
+			if (person.getAddress() != null)
+				personUpdated.setAddress(person.getAddress());
+			if (person.getCity() != null)
+				personUpdated.setCity(person.getCity());
+			if (person.getZip() != null)
+				personUpdated.setZip(person.getZip());
+			if (person.getEmail() != null)
+				personUpdated.setEmail(person.getEmail());
+			if (person.getPhone() != null)
+				personUpdated.setPhone(person.getPhone());
 
-		log.info("Updating person information" + personUpdated.toString());
-		Person personToUpdate = personService.savePerson(personUpdated);
-		MappingJacksonValue responsePerson = SafetyAlertsNetUtil.setFiltersToFalse(personToUpdate);
+			log.info("Updating person information" + personUpdated.toString());
+			Person personToUpdate = personService.savePerson(personUpdated);
+			MappingJacksonValue responsePerson = SafetyAlertsNetUtil.setFiltersToFalse(personToUpdate);
 
-		return new ResponseEntity<MappingJacksonValue>(responsePerson, HttpStatus.OK);
-
+			return new ResponseEntity<MappingJacksonValue>(responsePerson, HttpStatus.OK);
+		} else {
+			throw new NoSuchElementException();
+		}
 	}
 
 	/**
