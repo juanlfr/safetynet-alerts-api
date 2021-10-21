@@ -44,6 +44,12 @@ public class FireStationController {
 
 	private Logger log = LogManager.getLogger(FireStationController.class);
 
+	/**
+	 * Get a firestation by address
+	 * 
+	 * @param address
+	 * @return
+	 */
 	@GetMapping("/{address}")
 	public FireStation getFireStation(@PathVariable("address") final String address) {
 
@@ -79,7 +85,7 @@ public class FireStationController {
 	/**
 	 * Updates a fire station
 	 * 
-	 * @param id
+	 * @param address
 	 * @param fireStation
 	 * @return the fire station updated
 	 * @throws NoSuchElementException

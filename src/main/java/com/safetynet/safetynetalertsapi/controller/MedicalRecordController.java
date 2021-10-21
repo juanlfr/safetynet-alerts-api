@@ -34,8 +34,8 @@ public class MedicalRecordController {
 	/**
 	 * Get a medical record
 	 * 
-	 * @param id
-	 * @return
+	 * @param fullname
+	 * @return MedicalRecord
 	 */
 
 	@GetMapping("/{fullName}")
@@ -46,10 +46,17 @@ public class MedicalRecordController {
 
 	}
 
+	/**
+	 * Creates and saves a medical record
+	 * 
+	 * @param medicalRecord
+	 * @return ResponseEntity
+	 */
+
 	@PostMapping
 	public ResponseEntity<Void> createMedicalRecord(@RequestBody MedicalRecord medicalRecord) {
 
-		log.info("Creating MedicalRecord with id: " + medicalRecord.toString());
+		log.info("Creating MedicalRecord with name: " + medicalRecord.toString());
 		try {
 			MedicalRecord medicalRecordAdded = medicalRecordService.saveMedicalRecord(medicalRecord);
 			URI location = ServletUriComponentsBuilder.fromCurrentRequest()
@@ -68,7 +75,6 @@ public class MedicalRecordController {
 	/**
 	 * Updates a medical record
 	 * 
-	 * @param id
 	 * @param fireStation
 	 * @return the fire station updated
 	 * @throws NoSuchElementException

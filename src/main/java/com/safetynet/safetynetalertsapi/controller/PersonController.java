@@ -39,9 +39,9 @@ public class PersonController {
 	private Logger log = LogManager.getLogger(PersonController.class);
 
 	/**
-	 * Read - Get one employee
+	 * Read - Get one person
 	 * 
-	 * @param id The id of the employee
+	 * @param person's fullname
 	 * @return An person object full filled
 	 */
 	@GetMapping("/{fullName}")
@@ -50,6 +50,13 @@ public class PersonController {
 		log.info("Getting person information with name : " + fullName);
 		return personService.getPerson(fullName);
 	}
+
+	/**
+	 * Creates and save a person in BDD
+	 * 
+	 * @param person
+	 * @return ResponseEntity http status:201
+	 */
 
 	@PostMapping
 	public ResponseEntity<Void> createPerson(@RequestBody Person person) {
@@ -68,6 +75,11 @@ public class PersonController {
 		}
 	}
 
+	/**
+	 * Update - update a person's information
+	 * 
+	 * @param fullname - The fullname to update
+	 */
 	@PutMapping("/{fullName}")
 	public ResponseEntity<MappingJacksonValue> updatePerson(@PathVariable("fullName") final String fullName,
 			@RequestBody Person person)
