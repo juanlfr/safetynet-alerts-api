@@ -33,7 +33,7 @@ https://www.mongodb.com/try/download/community
 
 ### Running App
 
-Post installation of MongoDB, Java and Maven, you will have to set up a database named "SafetyNet"
+Post installation of MongoDB, Java and Maven, you will have to set up an empty database named "SafetyNet".
 
 Finally, you will be ready to import the code into an IDE of your choice and run the project as Spring Boot App or with the maven command line spring-boot:run.
 
